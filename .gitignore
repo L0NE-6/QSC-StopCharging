@@ -20,3 +20,6 @@ Desktop.ini
 .DS_Store
 *.swp
 *.tmp
+
+# local scratch (not published)
+_local/
