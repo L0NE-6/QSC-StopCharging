@@ -1,0 +1,8 @@
+id=QuantitativeStopCharging_switch
+name=QSC定量停充_独立开关版_安卓5-17适配
+version=20261004
+versionCode=2026100405
+author=单走一个6
+description=[ 未知状态 ] 到达指定电量、指定温度自动停止充电、自动恢复充电，配置路径：/data/adb/modules/QuantitativeStopCharging_switch/config.conf，日志log.log。安卓1-5老系统请用遗留root实验版。
+minMagisk=20400
+# ##

@@ -1,0 +1,22 @@
+# runtime / diagnostic output
+log.log
+probe.log
+qsc_nodes.log
+list_switch
+qsc.pid
+off_qsc
+off_d
+power_on
+power_off
+power_switch
+temp_switch
+now_c
+.bbin/
+.fail_warn
+
+# os / editor
+Thumbs.db
+Desktop.ini
+.DS_Store
+*.swp
+*.tmp

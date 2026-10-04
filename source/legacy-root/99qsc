@@ -1,0 +1,4 @@
+#!/system/bin/sh
+# QSC init.d 启动项（安卓1.6-5.x 老系统）
+sleep 20
+[ -x /data/qsc/boot.sh ] && /data/qsc/boot.sh

@@ -1,0 +1,5 @@
+# 保证 shell 脚本在 Windows 上克隆后仍是 LF，避免 shebang 带 \r 导致 Magisk 安装失败
+* text=auto eol=lf
+*.zip binary
+*.png binary
+*.jpg binary
