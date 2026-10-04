@@ -25,6 +25,7 @@ QSC 定量停充是一个运行在 root 环境下的充电控制模块：
 - 电量降到 **恢复电量**（默认 95%）→ 自动恢复充电；
 - 电池温度达到 **停止温度**（默认 60℃）→ 停止充电，降到 **恢复温度**（默认 50℃）→ 恢复充电；
 - `config.conf` 每 3 秒热重载一次，改完立即生效，不用重启。
+- 支持管理器内更新：内置 `updateJson`，在 Magisk / KernelSU / APatch 管理器里可直接检测并安装新版本（v3 起）。
 
 > 🎯 一句话：**让电池停在你想让它停的地方，而不是永远充到 100%。**
 >
@@ -58,7 +59,7 @@ QSC 定量停充是一个运行在 root 环境下的充电控制模块：
 - [QSC定量停充_安卓5-17适配版_20261004.zip](dist/QSC定量停充_安卓5-17适配版_20261004.zip)
 - [QSC定量停充_安卓1-5遗留root实验版.zip](dist/QSC定量停充_安卓1-5遗留root实验版.zip)
 
-也可以到本仓库的 **Releases** 页面下载。发布按版本分开、依次递增：**v1**（首个版本）、**v2**（当前版本，新增 qcom-battery 节点，红米 K40 / K50U 实测可用），后续版本继续递增；`dist/` 目录始终是最新版。
+也可以到本仓库的 **Releases** 页面下载。发布按版本分开、依次递增：**v1**（首个版本）、**v2**（qcom-battery，红米 K40 / K50U 实测可用）、**v3**（当前版本，支持管理器内更新），后续版本继续递增；`dist/` 目录始终是最新版。
 
 ---
 
@@ -70,6 +71,8 @@ QSC 定量停充是一个运行在 root 环境下的充电控制模块：
 2. 在 Magisk / KernelSU / ReSukiSU / APatch 管理器中刷入；
 3. **重启手机**（重启前 `service.sh` 不会启动，模块不工作）；
 4. 配置路径：`/data/adb/modules/QuantitativeStopCharging_switch/config.conf`，日志：同目录 `log.log`。
+
+> 💡 v3 起支持管理器内更新：以后有新版本，直接在 Magisk / KernelSU / APatch 管理器里点更新即可。
 
 ### 方式二：遗留 root 实验版（Android 1.6 ~ 5.x）
 
@@ -148,12 +151,15 @@ su -c sh /data/qsc/probe.sh
 
 ```
 QSC-StopCharging/
-├── dist/                          # 可直接刷入 / 安装的成品包
+├── dist/                          # 可直接刷入 / 安装的成品包（最新版）
 │   ├── QSC定量停充_安卓5-17适配版_20261004.zip
 │   └── QSC定量停充_安卓1-5遗留root实验版.zip
 ├── source/
 │   ├── qsc-a5-17/                 # 现代模块版源码（含 META-INF）
 │   └── legacy-root/               # 安卓 1.6-5.x 遗留 root 实验版源码
+├── update.json                    # 管理器内更新用的版本清单（updateJson）
+├── CHANGELOG.md                   # 更新日志（管理器内也会展示）
+├── RELEASING.md                   # 发布流程说明
 ├── LICENSE
 └── README.md
 ```
@@ -161,6 +167,12 @@ QSC-StopCharging/
 ---
 
 ## 📝 更新日志
+
+### v3 — 20261004（versionCode 2026100407）
+
+- 新增 `updateJson`，在 Magisk / KernelSU / APatch 管理器里可直接检测并更新（v1 / v2 需手动刷一次 v3，之后可在管理器内更新）；
+- 新增仓库根目录 `update.json`（版本清单）与 `CHANGELOG.md`；
+- 模块版本显示改为 `20261004-v3`，`versionCode`：2026100406 → 2026100407。
 
 ### v2 — 20261004（versionCode 2026100406）
 
