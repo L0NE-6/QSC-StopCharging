@@ -175,12 +175,16 @@ QSC-StopCharging/
 
 ## 💬 反馈与贡献
 
-遇到问题、有功能建议，或者发现了更好的实现方式，欢迎：
+发现 bug、想加功能，或者心里有更好的实现，欢迎直接来：
 
-- 提交 **Issue** —— 报 bug、提需求
-- 发起 **Pull Request** —— 直接贡献代码
+- **[提交 Issue](https://github.com/L0NE-6/QSC-StopCharging/issues/new)** —— 报 bug、提需求、吐槽都行
+- **[发起 Pull Request](https://github.com/L0NE-6/QSC-StopCharging/pulls)** —— 代码说话，改动越具体越好
 
-提 Issue 时如果能附上运行日志和复现步骤，定位会快很多 🙏
+想让定位快一点，Issue 里可以顺手带上：
+
+- 机型、系统版本，以及用的是哪个版本（安卓 5-17 适配版 / 安卓 1-5 遗留 root 版）
+- 相关日志：现代版 `log.log`、`probe.log`；遗留版 `/data/qsc/probe.log`
+- 复现步骤，比如“充到 80% 没有停充”就比“用不了”有用得多
 
 ---
 
