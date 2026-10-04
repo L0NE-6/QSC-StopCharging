@@ -195,6 +195,7 @@ build_switch_list() {
 	append_entry /sys/class/power_supply/battery/charge_disable 0 1
 	append_entry /sys/class/power_supply/usb/input_suspend 0 1
 	append_entry /sys/class/power_supply/idt/pin_enabled 1 0
+	append_entry /sys/class/qcom-battery/input_suspend 0 1
 	append_entry /sys/kernel/debug/google_charger/chg_suspend 0 1
 	append_entry /sys/kernel/debug/google_charger/chg_mode 1 0
 	append_entry /proc/driver/charger_limit_enable 0 1
@@ -204,7 +205,7 @@ build_switch_list() {
 	append_entry /proc/mtk_charger/en_power_path 1 0
 
 	# 通用扫描：只匹配充电控制相关且可安全 0/1 写入的文件
-	for f in /sys/class/power_supply/*/* /sys/class/power_supply/*/*/*; do
+	for f in /sys/class/power_supply/*/* /sys/class/power_supply/*/*/* /sys/class/qcom-battery/*; do
 		[ -f "$f" ] || continue
 		n="${f##*/}"
 		case "$n" in

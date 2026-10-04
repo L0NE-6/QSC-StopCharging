@@ -44,6 +44,7 @@ OUT="$MODDIR/probe.log"
 /sys/class/power_supply/battery/charge_disable
 /sys/class/power_supply/usb/input_suspend
 /sys/class/power_supply/idt/pin_enabled
+/sys/class/qcom-battery/input_suspend
 /sys/kernel/debug/google_charger/chg_suspend
 /sys/kernel/debug/google_charger/chg_mode
 /proc/driver/charger_limit_enable
@@ -60,7 +61,7 @@ OUT="$MODDIR/probe.log"
 	done
 	echo ""
 	echo "---------- 自动扫描 ----------"
-	find /sys/class/power_supply /sys/kernel/debug -maxdepth 3 -type f 2>/dev/null | grep -E -i 'input_suspend|charge.*(enable|disable|stop|suspend)|(enable|disable|stop).*charge|slate_mode|store_mode' | while IFS= read -r f; do
+	find /sys/class/power_supply /sys/class/qcom-battery /sys/kernel/debug -maxdepth 3 -type f 2>/dev/null | grep -E -i 'input_suspend|charge.*(enable|disable|stop|suspend)|(enable|disable|stop).*charge|slate_mode|store_mode' | while IFS= read -r f; do
 		w="no"
 		[ -w "$f" ] && w="yes"
 		echo "$f = $(cat "$f" 2>/dev/null) | writable:$w"

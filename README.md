@@ -30,6 +30,17 @@ QSC 定量停充是一个运行在 root 环境下的充电控制模块：
 >
 > 🔒 本版本已移除原版的联网自更新逻辑，**不联网、不上传、无遥测**，日志与配置全部留在手机本地。
 
+## ✅ 已实现机型
+
+以下机型已有实测反馈可用：
+
+| 机型 | 状态 | 说明 |
+| :--- | :---: | :--- |
+| 红米 K40 | ✅ 可用 | 骁龙平台 `qcom-battery/input_suspend` 节点 |
+| 红米 K50U | ✅ 可用 | 骁龙平台 `qcom-battery/input_suspend` 节点 |
+
+> 其他骁龙机型如果内核暴露了 `/sys/class/qcom-battery/input_suspend`，也有机会直接可用；欢迎在 Issue 里反馈机型和结果。
+
 ---
 
 ## 📦 两个版本怎么选
@@ -151,8 +162,9 @@ QSC-StopCharging/
 
 ## 📝 更新日志
 
-### 20261004（R5）
+### 20261004（R5 / versionCode 2026100406）
 
+- 新增高通 `qcom-battery/input_suspend` 节点支持（骁龙机型实测可停充）：**红米 K40、红米 K50U**；
 - 现代模块安装器：`customize.sh` + `module.prop` + 官方 recovery `update-binary`，支持管理器安装与 recovery 刷入（Magisk v20.4+）；
 - 安装脚本不依赖 Magisk 专有命令，`set_perm` / `ui_print` 缺失时自动回退；
 - 全面 toybox 兼容，安卓 5-11 缺少 `awk` 等命令时自动使用 busybox 兜底；
