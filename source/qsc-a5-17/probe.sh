@@ -45,6 +45,13 @@ OUT="$MODDIR/probe.log"
 /sys/class/power_supply/usb/input_suspend
 /sys/class/power_supply/idt/pin_enabled
 /sys/class/qcom-battery/input_suspend
+/sys/class/power_supply/battery/charge_behaviour
+/sys/class/power_supply/battery/charge_control_limit
+/sys/class/power_supply/battery/charge_control_limit_max
+/sys/class/power_supply/battery/charge_control_end_threshold
+/sys/class/power_supply/battery/constant_charge_current_max
+/sys/class/power_supply/battery/input_current_limit
+/sys/class/power_supply/battery/battery_charging_enabled
 /sys/kernel/debug/google_charger/chg_suspend
 /sys/kernel/debug/google_charger/chg_mode
 /proc/driver/charger_limit_enable
@@ -61,7 +68,22 @@ OUT="$MODDIR/probe.log"
 	done
 	echo ""
 	echo "---------- 自动扫描 ----------"
-	find /sys/class/power_supply /sys/class/qcom-battery /sys/kernel/debug -maxdepth 3 -type f 2>/dev/null | grep -E -i 'input_suspend|charge.*(enable|disable|stop|suspend)|(enable|disable|stop).*charge|slate_mode|store_mode' | while IFS= read -r f; do
+	find /sys/class/power_supply /sys/class/qcom-battery /sys/kernel/debug -maxdepth 3 -type f 2>/dev/null | grep -E -i 'input_suspend|charge.*(enable|disable|stop|suspend)|(enable|disable|stop).*charge|slate_mode|store_mode|charge_behaviour|charge_control|current_limit' | while IFS= read -r f; do
+		w="no"
+		[ -w "$f" ] && w="yes"
+		echo "$f = $(cat "$f" 2>/dev/null) | writable:$w"
+	done
+	echo ""
+	echo "---------- 扩展扫描 ----------"
+	echo "== /sys/class 顶层 =="
+	ls -1 /sys/class 2>/dev/null
+	for d in /sys/class/power_supply /sys/class/qcom-battery /sys/class/charger /sys/class/mi_charger /sys/class/xiaomi_charger /sys/devices/virtual/power_supply; do
+		[ -d "$d" ] || continue
+		echo "== $d =="
+		find "$d" -maxdepth 3 2>/dev/null
+	done
+	echo "== 名字相关节点（含可写标记） =="
+	find /sys/class /sys/devices/virtual -maxdepth 5 -type f 2>/dev/null | grep -E -i 'charge|batt|suspend|slate|store|behaviour|behavior' | while IFS= read -r f; do
 		w="no"
 		[ -w "$f" ] && w="yes"
 		echo "$f = $(cat "$f" 2>/dev/null) | writable:$w"

@@ -42,6 +42,8 @@ QSC 定量停充是一个运行在 root 环境下的充电控制模块：
 | 小米 14 | ✅ 可用 | 骁龙平台 `qcom-battery/input_suspend` 节点；v4 修复反复充停 |
 
 > 其他骁龙机型如果内核暴露了 `/sys/class/qcom-battery/input_suspend`，也有机会直接可用；欢迎在 Issue 里反馈机型和结果。
+>
+> ⏳ 适配中：**小米 17 Pro**（v5 已加入标准 `charge_behaviour` 支持并扩展节点扫描；如果仍无效，请用 v5 的 `probe.sh` 跑一次，把新的 `probe.log` 发出来）。
 
 ---
 
@@ -60,7 +62,7 @@ QSC 定量停充是一个运行在 root 环境下的充电控制模块：
 - [QSC定量停充_安卓5-17适配版_20261004.zip](dist/QSC定量停充_安卓5-17适配版_20261004.zip)
 - [QSC定量停充_安卓1-5遗留root实验版.zip](dist/QSC定量停充_安卓1-5遗留root实验版.zip)
 
-也可以到本仓库的 **Releases** 页面下载。发布按版本分开、依次递增：**v1**（首个版本）、**v2**（qcom-battery，红米 K40 / K50U 实测可用）、**v3**（管理器内更新）、**v4**（当前版本，新增小米 14，修复反复充停），后续版本继续递增；`dist/` 目录始终是最新版。
+也可以到本仓库的 **Releases** 页面下载。发布按版本分开、依次递增：**v1**（首个版本）、**v2**（qcom-battery，红米 K40 / K50U 实测可用）、**v3**（管理器内更新）、**v4**（修复小米 14 反复充停）、**v5**（当前版本，扩展节点扫描 + `charge_behaviour` 适配尝试），后续版本继续递增；`dist/` 目录始终是最新版。
 
 ---
 
@@ -168,6 +170,13 @@ QSC-StopCharging/
 ---
 
 ## 📝 更新日志
+
+### v5 — 20261004（versionCode 2026100409）
+
+- 尝试适配小米 17 Pro：新增标准内核接口 `charge_behaviour`（`auto` / `inhibit-charge`）支持，并兼容带 `[当前值]` 的枚举显示；
+- `probe.sh` 新增「扩展扫描」：列出 `/sys/class` 顶层、`power_supply` / `qcom-battery` 等目录全部节点，以及所有名字含 charge / batt / suspend 的节点与可写性；
+- 小米 14 的反复充停修复保持不变；
+- `versionCode`：2026100408 → 2026100409。
 
 ### v4 — 20261004（versionCode 2026100408）
 

@@ -1,5 +1,12 @@
 # 更新日志
 
+## v5 — 20261004（versionCode 2026100409）
+
+- 尝试适配小米 17 Pro：新增标准内核接口 `charge_behaviour`（`auto` / `inhibit-charge`）支持，并兼容带 `[当前值]` 的枚举显示；
+- `probe.sh` 新增「扩展扫描」：列出 `/sys/class` 顶层、`power_supply` / `qcom-battery` 等目录全部节点，以及所有名字含 charge / batt / suspend 的节点与可写性；
+- 小米 14 的反复充停修复保持不变；
+- `versionCode`：2026100408 → 2026100409。
+
 ## v4 — 20261004（versionCode 2026100408）
 
 - 修复小米 14 反复充电 / 停止：不再写入 `handle_stop_charging`（内核处理节点），避免每 6 秒重复触发；

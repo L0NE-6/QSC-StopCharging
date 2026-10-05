@@ -196,6 +196,7 @@ build_switch_list() {
 	append_entry /sys/class/power_supply/usb/input_suspend 0 1
 	append_entry /sys/class/power_supply/idt/pin_enabled 1 0
 	append_entry /sys/class/qcom-battery/input_suspend 0 1
+	append_entry /sys/class/power_supply/battery/charge_behaviour auto inhibit-charge
 	append_entry /sys/kernel/debug/google_charger/chg_suspend 0 1
 	append_entry /sys/kernel/debug/google_charger/chg_mode 1 0
 	append_entry /proc/driver/charger_limit_enable 0 1
@@ -211,6 +212,8 @@ build_switch_list() {
 		# 小米14等机型：handle_stop_charging 是内核处理节点，重复写入会引发反复充停
 		[ "$n" = "handle_stop_charging" ] && continue
 		case "$n" in
+			*charge_behaviour*)
+				append_entry "$f" auto inhibit-charge ;;
 			*input_suspend*|*charge*disable*|*disable*charge*|*stop_charge*|*stop_charging*|*charging_suspend*|*slate_mode*|*store_mode*)
 				append_entry "$f" 0 1 ;;
 			*charging_enabled*|*charging_enable*|*enable_charge*|*enable_charging*)
@@ -244,6 +247,9 @@ set_switch_value() {
 	[ -e "$path" ] || return 1
 	cur="$(cat "$path" 2>/dev/null | tr -d '\r\n')"
 	[ "$cur" = "$val" ] && return 2
+	case "$cur" in
+		*"[$val]"*) return 2 ;;
+	esac
 	chmod 0644 "$path" 2>/dev/null
 	printf '%s\n' "$val" > "$path" 2>/dev/null || return 1
 	return 0
