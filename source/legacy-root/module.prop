@@ -1,7 +1,7 @@
 id=QuantitativeStopCharging_legacy
 name=QSC定量停充_遗留模式
-version=20261004
-versionCode=2026100405
+version=20261004-v4
+versionCode=2026100408
 author=单走一个6
 description=[ 未知状态 ] 到达指定电量、指定温度自动停止充电、自动恢复充电。配置目录：/data/qsc。
 # ##

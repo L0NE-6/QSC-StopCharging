@@ -208,6 +208,8 @@ build_switch_list() {
 	for f in /sys/class/power_supply/*/* /sys/class/power_supply/*/*/* /sys/class/qcom-battery/*; do
 		[ -f "$f" ] || continue
 		n="${f##*/}"
+		# 小米14等机型：handle_stop_charging 是内核处理节点，重复写入会引发反复充停
+		[ "$n" = "handle_stop_charging" ] && continue
 		case "$n" in
 			*input_suspend*|*charge*disable*|*disable*charge*|*stop_charge*|*stop_charging*|*charging_suspend*|*slate_mode*|*store_mode*)
 				append_entry "$f" 0 1 ;;
@@ -240,6 +242,8 @@ set_switch_value() {
 	esac
 	val="$(printf '%s' "$val" | tr '_' ' ')"
 	[ -e "$path" ] || return 1
+	cur="$(cat "$path" 2>/dev/null | tr -d '\r\n')"
+	[ "$cur" = "$val" ] && return 2
 	chmod 0644 "$path" 2>/dev/null
 	printf '%s\n' "$val" > "$path" 2>/dev/null || return 1
 	return 0
@@ -250,9 +254,11 @@ apply_side() {
 	ok=""
 	fails=""
 	for ent in $SWITCH_LIST; do
-		if set_switch_value "$ent" "$side"; then
+		set_switch_value "$ent" "$side"
+		rc=$?
+		if [ "$rc" = "0" ]; then
 			ok="$ok ${ent%%,*}"
-		else
+		elif [ "$rc" != "2" ]; then
 			fails="$fails ${ent%%,*}"
 		fi
 	done
@@ -265,27 +271,42 @@ apply_side() {
 		rm -f "$MODDIR/.fail_warn"
 	fi
 	printf '%s' "$ok"
+	if [ -n "$ok" ]; then
+		return 0
+	fi
+	if [ -n "$fails" ]; then
+		return 1
+	fi
+	return 2
 }
 
 qsc_power_stop() {
 	ok="$(apply_side stop)"
-	if [ -n "$ok" ]; then
+	rc=$?
+	if [ "$rc" = "0" ]; then
 		NODE_WARN=0
 		log_line "写入停止充电开关:$ok"
-	else
-		if [ "$NODE_WARN" = "0" ]; then
-			NODE_WARN=1
-			log_line "未找到可用的充电开关节点，请运行 probe.sh 检查设备节点后反馈"
-		fi
+		return 0
 	fi
+	if [ "$rc" = "1" ]; then
+		return 1
+	fi
+	if [ -z "$SWITCH_LIST" ] && [ "$NODE_WARN" = "0" ]; then
+		NODE_WARN=1
+		log_line "未找到可用的充电开关节点，请运行 probe.sh 检查设备节点后反馈"
+	fi
+	return 2
 }
 
 qsc_power_start() {
 	ok="$(apply_side start)"
-	if [ -n "$ok" ]; then
+	rc=$?
+	if [ "$rc" = "0" ]; then
 		NODE_WARN=0
 		log_line "写入恢复充电开关:$ok"
+		return 0
 	fi
+	return $rc
 }
 
 do_power_reset() {
@@ -426,11 +447,14 @@ while true; do
 			fi
 			sleep 3
 			qsc_power_stop
+			rc=$?
 			touch "$POWER_SWITCH"
-			if [ "$cpu_log" = "1" ]; then
-				log_line "电量$BAT_LEVEL 触发开关温控：停止充电 温度$BAT_TEMP"
-			else
-				log_line "电量$BAT_LEVEL 停止充电"
+			if [ "$rc" = "0" ]; then
+				if [ "$cpu_log" = "1" ]; then
+					log_line "电量$BAT_LEVEL 触发开关温控：停止充电 温度$BAT_TEMP"
+				else
+					log_line "电量$BAT_LEVEL 停止充电"
+				fi
 			fi
 		else
 			reset_log=1
@@ -466,12 +490,15 @@ while true; do
 			fi
 			sleep 3
 			qsc_power_start
+			rc=$?
 			rm -f "$TEMP_MARK"
 			rm -f "$POWER_SWITCH"
-			if [ "$cpu_log2" = "1" ]; then
-				log_line "电量$BAT_LEVEL 触发开关温控：恢复充电 温度$BAT_TEMP"
-			else
-				log_line "电量$BAT_LEVEL 恢复充电"
+			if [ "$rc" = "0" ]; then
+				if [ "$cpu_log2" = "1" ]; then
+					log_line "电量$BAT_LEVEL 触发开关温控：恢复充电 温度$BAT_TEMP"
+				else
+					log_line "电量$BAT_LEVEL 恢复充电"
+				fi
 			fi
 		fi
 	fi
