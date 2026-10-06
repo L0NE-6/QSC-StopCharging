@@ -173,6 +173,9 @@ QSC-StopCharging/
 
 ## 📝 更新日志
 
+<details>
+<summary>点击展开完整更新日志</summary>
+
 ### v8 — 20261004（versionCode 2026100412）
 
 - 定位小米 17 Pro 根因：电池驱动的 `charge_control_limit` 是「显示可写但 set 为空」的实现，写入无效；真正控制充电的是 MCA `xm_power` 接口；
@@ -232,6 +235,7 @@ QSC-StopCharging/
 - 写入失败会记录具体节点，SELinux / 权限问题一眼可见；
 - 新增安卓 1.6-5.x 遗留 root 实验版（init.d / install-recovery / SManager）。
 
+</details>
 ---
 
 ## ⚠️ 注意事项
