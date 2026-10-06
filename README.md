@@ -160,6 +160,8 @@ QSC-StopCharging/
 ├── source/
 │   ├── qsc-a5-17/                 # 现代模块版源码（含 META-INF）
 │   └── legacy-root/               # 安卓 1.6-5.x 遗留 root 实验版源码
+├── assets/
+│   └── donate/                    # 打赏二维码（支付宝 / 微信）
 ├── update.json                    # 管理器内更新用的版本清单（updateJson）
 ├── CHANGELOG.md                   # 更新日志（管理器内也会展示）
 ├── RELEASING.md                   # 发布流程说明
@@ -239,6 +241,17 @@ QSC-StopCharging/
 - 机型、系统版本，以及用的是哪个版本（安卓 5-17 适配版 / 安卓 1-5 遗留 root 版）
 - 相关日志：现代版 `log.log`、`probe.log`；遗留版 `/data/qsc/probe.log`
 - 复现步骤，比如“充到 80% 没有停充”就比“用不了”有用得多
+
+---
+
+## ☕ 投喂与打赏
+
+如果这个模块帮你省了心，愿意请我喝杯饮料的话，可以扫下面任意一个码。
+完全自愿，不打赏也照常维护和更新。
+
+| <img src="assets/donate/alipay.jpg" alt="支付宝" width="260"> | <img src="assets/donate/wechat.png" alt="微信支付" width="260"> |
+| :---: | :---: |
+| 支付宝 | 微信支付 |
 
 ---
 
