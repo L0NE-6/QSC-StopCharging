@@ -45,6 +45,9 @@ OUT="$MODDIR/probe.log"
 /sys/class/power_supply/usb/input_suspend
 /sys/class/power_supply/idt/pin_enabled
 /sys/class/qcom-battery/input_suspend
+/sys/class/xm_power/charger/charge_interface/input_suspend
+/sys/class/xm_power/charger/charge_interface/charge_enable
+/sys/class/xm_power/charger/charge_interface/suspend_status
 /sys/class/power_supply/battery/charge_behaviour
 /sys/class/power_supply/battery/charge_control_limit
 /sys/class/power_supply/battery/charge_control_limit_max
@@ -87,7 +90,12 @@ OUT="$MODDIR/probe.log"
 	for d in /sys/class/power_supply/battery /sys/class/power_supply/usb /sys/class/power_supply/wireless; do
 		[ -d "$d" ] || continue
 		echo "== $d 全部属性 =="
-		ls -la "$d" 2>/dev/null
+		ls -la "$d/" 2>/dev/null
+	done
+	for d in /sys/class/xm_power /sys/class/xm_power/charger; do
+		[ -d "$d" ] || continue
+		echo "== $d 全部属性 =="
+		ls -la "$d/" 2>/dev/null
 	done
 	echo "== 名字相关节点（含可写标记） =="
 	find /sys/class /sys/devices/virtual -maxdepth 5 -type f 2>/dev/null | grep -E -i 'charge|batt|suspend|slate|store|behaviour|behavior' | while IFS= read -r f; do

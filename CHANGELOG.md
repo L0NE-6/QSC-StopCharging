@@ -1,5 +1,12 @@
 # 更新日志
 
+## v8 — 20261004（versionCode 2026100412）
+
+- 定位小米 17 Pro 根因：其电池驱动的 `charge_control_limit` 是「显示可写但 set 为空」的实现，写入无效；真正的控制接口是 MCA `xm_power` 充电接口；
+- 新增 MCA 支持：向 `/sys/class/xm_power/charger/charge_interface/input_suspend` 写入 `qsc all 1` 停止充电、`qsc all 0` 恢复充电；
+- `probe.sh` 加入该节点与 `xm_power` 目录列举，并修正 battery / usb / wireless 属性列举（之前 `ls` 未跟随软链接）；
+- `versionCode`：2026100411 → 2026100412。
+
 ## v7 — 20261004（versionCode 2026100411）
 
 - 安装 / 更新后首次开机自动跳转酷安主页 `https://www.coolapk.com/u/1429422`：检测到酷安 App（`com.coolapk.market`）时优先用 App 打开，未安装则用浏览器打开；

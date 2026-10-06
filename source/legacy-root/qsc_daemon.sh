@@ -4,6 +4,7 @@
 # 配置每 3 秒重新读取一次，修改 config.conf 即时生效，无需重启。
 
 MODDIR=${0%/*}
+MCA_IF="/sys/class/xm_power/charger/charge_interface/input_suspend"
 PIDFILE="$MODDIR/qsc.pid"
 LOG="$MODDIR/log.log"
 NOW_C="$MODDIR/now_c"
@@ -301,6 +302,17 @@ apply_side() {
 qsc_power_stop() {
 	ok="$(apply_side stop)"
 	rc=$?
+	if [ -e "$MCA_IF" ]; then
+		mca_cur="$(cat "$MCA_IF" 2>/dev/null | tr -d '\r')"
+		case "$mca_cur" in
+			*"qsc 1"*) ;;
+			*)
+				if printf 'qsc all 1\n' > "$MCA_IF" 2>/dev/null; then
+					ok="$ok $MCA_IF"
+					rc=0
+				fi ;;
+		esac
+	fi
 	if [ "$rc" = "0" ]; then
 		NODE_WARN=0
 		log_line "写入停止充电开关:$ok"
@@ -309,7 +321,7 @@ qsc_power_stop() {
 	if [ "$rc" = "1" ]; then
 		return 1
 	fi
-	if [ -z "$SWITCH_LIST" ] && [ "$NODE_WARN" = "0" ]; then
+	if [ -z "$SWITCH_LIST" ] && [ ! -e "$MCA_IF" ] && [ "$NODE_WARN" = "0" ]; then
 		NODE_WARN=1
 		log_line "未找到可用的充电开关节点，请运行 probe.sh 检查设备节点后反馈"
 	fi
@@ -319,6 +331,17 @@ qsc_power_stop() {
 qsc_power_start() {
 	ok="$(apply_side start)"
 	rc=$?
+	if [ -e "$MCA_IF" ]; then
+		mca_cur="$(cat "$MCA_IF" 2>/dev/null | tr -d '\r')"
+		case "$mca_cur" in
+			*"qsc 0"*) ;;
+			*)
+				if printf 'qsc all 0\n' > "$MCA_IF" 2>/dev/null; then
+					ok="$ok $MCA_IF"
+					rc=0
+				fi ;;
+		esac
+	fi
 	if [ "$rc" = "0" ]; then
 		NODE_WARN=0
 		log_line "写入恢复充电开关:$ok"
