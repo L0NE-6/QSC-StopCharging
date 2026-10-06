@@ -63,3 +63,4 @@ QSC 定量停充 - 安卓5-17 适配版（20261004 R5）
 12. v6 适配尝试：新增 charge_control_limit 支持（0=停止充电，charge_control_limit_max=恢复充电）；probe.sh 可完整列出 battery / usb / wireless 属性。
 13. v7：安装/更新后首次开机自动跳转酷安主页（有酷安 App 直接打开 App，没有则用浏览器打开）。
 14. v8：新增小米17 Pro等 MCA 机型支持（xm_power charge_interface input_suspend，qsc all 1/0）；probe 修正 battery/usb/wireless 属性列举并加入 xm_power 节点。
+15. v9：小米17 Pro 改用 MCA charge_enable 直接关闭充电（qsc all 0 停充 / qsc all 1 恢复），input_suspend 作为辅助，修复「写入成功但仍在充电」。

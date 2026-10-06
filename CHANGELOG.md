@@ -1,5 +1,11 @@
 # 更新日志
 
+## v9 — 20261004（versionCode 2026100413）
+
+- 修复小米 17 Pro「写入成功但仍在充电」：仅挂起 `input_suspend` 只限制了输入，主充电路径仍然开启；
+- 改用 MCA `charge_enable` 直接关闭充电：停止充电写 `qsc all 0`，恢复充电写 `qsc all 1`；`input_suspend` 保留为辅助控制；
+- `versionCode`：2026100412 → 2026100413。
+
 ## v8 — 20261004（versionCode 2026100412）
 
 - 定位小米 17 Pro 根因：其电池驱动的 `charge_control_limit` 是「显示可写但 set 为空」的实现，写入无效；真正的控制接口是 MCA `xm_power` 充电接口；
