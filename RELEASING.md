@@ -4,7 +4,7 @@
 
 1. 修改 `source/qsc-a5-17/module.prop`：
    - `version` 改为 `20261004-vN`
-   - `versionCode` 递增（当前为 `2026100410`）
+   - `versionCode` 递增（当前为 `2026100411`）
 2. 重新打包 `dist/QSC定量停充_安卓5-17适配版_20261004.zip`（至少更新内部的 `module.prop` 与 `README.txt`）。
 3. 更新仓库根目录的：
    - `update.json`：`version`、`versionCode`、`zipUrl` 指向新 Release 的 vN 附件

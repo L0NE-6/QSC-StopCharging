@@ -1,5 +1,12 @@
 # 更新日志
 
+## v7 — 20261004（versionCode 2026100411）
+
+- 安装 / 更新后首次开机自动跳转酷安主页 `https://www.coolapk.com/u/1429422`：检测到酷安 App（`com.coolapk.market`）时优先用 App 打开，未安装则用浏览器打开；
+- 跳转只在每次新安装 / 更新后的第一次开机执行一次（`.welcome_shown` 标记）；
+- 停充逻辑与 v6 一致（含小米 17 Pro 的 `charge_control_limit` 适配尝试）；
+- `versionCode`：2026100410 → 2026100411。
+
 ## v6 — 20261004（versionCode 2026100410）
 
 - 尝试适配小米 17 Pro：新增标准 `charge_control_limit` 支持（停止充电写 `0`，恢复充电写 `charge_control_limit_max`，该机为 16）；

@@ -62,7 +62,7 @@ QSC 定量停充是一个运行在 root 环境下的充电控制模块：
 - [QSC定量停充_安卓5-17适配版_20261004.zip](dist/QSC定量停充_安卓5-17适配版_20261004.zip)
 - [QSC定量停充_安卓1-5遗留root实验版.zip](dist/QSC定量停充_安卓1-5遗留root实验版.zip)
 
-也可以到本仓库的 **Releases** 页面下载。发布按版本分开、依次递增：**v1**（首个版本）、**v2**（qcom-battery，红米 K40 / K50U 实测可用）、**v3**（管理器内更新）、**v4**（修复小米 14 反复充停）、**v5**（扩展节点扫描 + `charge_behaviour`）、**v6**（当前版本，`charge_control_limit` 适配小米 17 Pro），后续版本继续递增；`dist/` 目录始终是最新版。
+也可以到本仓库的 **Releases** 页面下载。发布按版本分开、依次递增：**v1**（首个版本）、**v2**（qcom-battery，红米 K40 / K50U 实测可用）、**v3**（管理器内更新）、**v4**（修复小米 14 反复充停）、**v5**（扩展节点扫描 + `charge_behaviour`）、**v6**（`charge_control_limit` 适配小米 17 Pro）、**v7**（当前版本，安装后跳转酷安主页），后续版本继续递增；`dist/` 目录始终是最新版。
 
 ---
 
@@ -172,6 +172,13 @@ QSC-StopCharging/
 ---
 
 ## 📝 更新日志
+
+### v7 — 20261004（versionCode 2026100411）
+
+- 安装 / 更新后首次开机自动跳转酷安主页 `https://www.coolapk.com/u/1429422`：检测到酷安 App（`com.coolapk.market`）时优先用 App 打开，未安装则用浏览器打开；
+- 跳转只在每次新安装 / 更新后的第一次开机执行一次（`.welcome_shown` 标记）；
+- 停充逻辑与 v6 一致（含小米 17 Pro 的 `charge_control_limit` 适配尝试）；
+- `versionCode`：2026100410 → 2026100411。
 
 ### v6 — 20261004（versionCode 2026100410）
 
