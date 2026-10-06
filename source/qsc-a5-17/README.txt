@@ -60,3 +60,4 @@ QSC 定量停充 - 安卓5-17 适配版（20261004 R5）
 如仍停在停充状态，重启一次即可（sysfs 状态在重启后复位）。
 10. 修复小米14等机型反复充停：不再写入 handle_stop_charging，节点已是目标值时不会重复写入。
 11. v5 适配尝试：新增标准 charge_behaviour（auto / inhibit-charge）支持；probe.sh 增加扩展扫描，用于小米17 Pro等新机型定位节点。
+12. v6 适配尝试：新增 charge_control_limit 支持（0=停止充电，charge_control_limit_max=恢复充电）；probe.sh 可完整列出 battery / usb / wireless 属性。

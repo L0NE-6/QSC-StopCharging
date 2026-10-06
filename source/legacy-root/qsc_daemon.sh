@@ -197,6 +197,12 @@ build_switch_list() {
 	append_entry /sys/class/power_supply/idt/pin_enabled 1 0
 	append_entry /sys/class/qcom-battery/input_suspend 0 1
 	append_entry /sys/class/power_supply/battery/charge_behaviour auto inhibit-charge
+	# 小米17 Pro等新机型：标准 charge_control_limit（0=停止充电，max=恢复充电）
+	ccl_max="$(cat /sys/class/power_supply/battery/charge_control_limit_max 2>/dev/null | tr -d '\r\n')"
+	case "$ccl_max" in
+		''|*[!0-9]*) ;;
+		*) append_entry /sys/class/power_supply/battery/charge_control_limit "$ccl_max" 0 ;;
+	esac
 	append_entry /sys/kernel/debug/google_charger/chg_suspend 0 1
 	append_entry /sys/kernel/debug/google_charger/chg_mode 1 0
 	append_entry /proc/driver/charger_limit_enable 0 1
@@ -214,6 +220,12 @@ build_switch_list() {
 		case "$n" in
 			*charge_behaviour*)
 				append_entry "$f" auto inhibit-charge ;;
+			charge_control_limit)
+				ccl_m="$(cat "${f%/*}/charge_control_limit_max" 2>/dev/null | tr -d '\r\n')"
+				case "$ccl_m" in
+					''|*[!0-9]*) ;;
+					*) append_entry "$f" "$ccl_m" 0 ;;
+				 esac ;;
 			*input_suspend*|*charge*disable*|*disable*charge*|*stop_charge*|*stop_charging*|*charging_suspend*|*slate_mode*|*store_mode*)
 				append_entry "$f" 0 1 ;;
 			*charging_enabled*|*charging_enable*|*enable_charge*|*enable_charging*)

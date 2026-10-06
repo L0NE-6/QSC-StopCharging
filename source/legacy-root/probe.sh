@@ -61,17 +61,19 @@ OUT="$MODDIR/probe.log"
 /proc/mtk_charger/en_power_path"
 	for f in $CANDIDATES; do
 		if [ -e "$f" ]; then
+			lsline="$(ls -l "$f" 2>/dev/null)"
 			w="no"
-			[ -w "$f" ] && w="yes"
-			echo "$f = $(cat "$f" 2>/dev/null) | writable:$w | $(ls -l "$f" 2>/dev/null)"
+			case "$lsline" in -*w*) w="yes" ;; esac
+			echo "$f = $(cat "$f" 2>/dev/null) | writable:$w | $lsline"
 		fi
 	done
 	echo ""
 	echo "---------- 自动扫描 ----------"
 	find /sys/class/power_supply /sys/class/qcom-battery /sys/kernel/debug -maxdepth 3 -type f 2>/dev/null | grep -E -i 'input_suspend|charge.*(enable|disable|stop|suspend)|(enable|disable|stop).*charge|slate_mode|store_mode|charge_behaviour|charge_control|current_limit' | while IFS= read -r f; do
+		lsline="$(ls -l "$f" 2>/dev/null)"
 		w="no"
-		[ -w "$f" ] && w="yes"
-		echo "$f = $(cat "$f" 2>/dev/null) | writable:$w"
+		case "$lsline" in -*w*) w="yes" ;; esac
+		echo "$f = $(cat "$f" 2>/dev/null) | writable:$w | $lsline"
 	done
 	echo ""
 	echo "---------- 扩展扫描 ----------"
@@ -82,11 +84,17 @@ OUT="$MODDIR/probe.log"
 		echo "== $d =="
 		find "$d" -maxdepth 3 2>/dev/null
 	done
+	for d in /sys/class/power_supply/battery /sys/class/power_supply/usb /sys/class/power_supply/wireless; do
+		[ -d "$d" ] || continue
+		echo "== $d 全部属性 =="
+		ls -la "$d" 2>/dev/null
+	done
 	echo "== 名字相关节点（含可写标记） =="
 	find /sys/class /sys/devices/virtual -maxdepth 5 -type f 2>/dev/null | grep -E -i 'charge|batt|suspend|slate|store|behaviour|behavior' | while IFS= read -r f; do
+		lsline="$(ls -l "$f" 2>/dev/null)"
 		w="no"
-		[ -w "$f" ] && w="yes"
-		echo "$f = $(cat "$f" 2>/dev/null) | writable:$w"
+		case "$lsline" in -*w*) w="yes" ;; esac
+		echo "$f = $(cat "$f" 2>/dev/null) | writable:$w | $lsline"
 	done
 	echo ""
 	echo "---------- qsc_nodes.log ----------"

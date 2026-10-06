@@ -1,5 +1,12 @@
 # 更新日志
 
+## v6 — 20261004（versionCode 2026100410）
+
+- 尝试适配小米 17 Pro：新增标准 `charge_control_limit` 支持（停止充电写 `0`，恢复充电写 `charge_control_limit_max`，该机为 16）；
+- `probe.sh` 按文件权限判断真实可写性（不再被 root 的 `-w` 误判），并完整列出 battery / usb / wireless 的全部属性；
+- v5 的 `charge_behaviour` 支持保留；
+- `versionCode`：2026100409 → 2026100410。
+
 ## v5 — 20261004（versionCode 2026100409）
 
 - 尝试适配小米 17 Pro：新增标准内核接口 `charge_behaviour`（`auto` / `inhibit-charge`）支持，并兼容带 `[当前值]` 的枚举显示；
