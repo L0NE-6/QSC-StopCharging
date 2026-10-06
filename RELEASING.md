@@ -9,6 +9,7 @@
 3. 更新仓库根目录的：
    - `update.json`：`version`、`versionCode`、`zipUrl` 指向新 Release 的 vN 附件
    - `CHANGELOG.md`：补 vN 的更新内容
+   - `update-changelog.md`：只写本次 vN 的更新内容（管理器更新弹窗会展示这里）
    - `README.md`：补更新日志
 4. 提交并推送 `main`。
 5. 创建 Release：
