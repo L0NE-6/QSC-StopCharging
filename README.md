@@ -40,6 +40,7 @@ QSC 定量停充是一个运行在 root 环境下的充电控制模块：
 | 红米 K40 | ✅ 可用 | 骁龙平台 `qcom-battery/input_suspend` 节点 |
 | 红米 K50U | ✅ 可用 | 骁龙平台 `qcom-battery/input_suspend` 节点 |
 | 小米 14 | ✅ 可用 | 骁龙平台 `qcom-battery/input_suspend` 节点；v4 修复反复充停 |
+| 红米 Note 12 Turbo | ✅ 可用 | 用户实测反馈可用 |
 
 > 其他骁龙机型如果内核暴露了 `/sys/class/qcom-battery/input_suspend`，也有机会直接可用；欢迎在 Issue 里反馈机型和结果。
 >
