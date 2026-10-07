@@ -41,10 +41,11 @@ QSC 定量停充是一个运行在 root 环境下的充电控制模块：
 | 红米 K50U | ✅ 可用 | 骁龙平台 `qcom-battery/input_suspend` 节点 |
 | 小米 14 | ✅ 可用 | 骁龙平台 `qcom-battery/input_suspend` 节点；v4 修复反复充停 |
 | 红米 Note 12 Turbo | ✅ 可用 | 用户实测反馈可用 |
+| 小米 17 Pro | ✅ 可用 | MCA `xm_power`：`charge_enable` 关充电 + `input_suspend` 改状态显示；v10 起停充后充电图标也会消失 |
 
 > 其他骁龙机型如果内核暴露了 `/sys/class/qcom-battery/input_suspend`，也有机会直接可用；欢迎在 Issue 里反馈机型和结果。
 >
-> ⏳ 适配中：**小米 17 Pro**（v10：`charge_enable` 用 `qsc all 0/1` 直接关充电，`input_suspend` 改用 `micharge` 客户端投票让系统上报 `DISCHARGING`、消除充电图标；等待实机确认）。
+> ✅ 小米 17 Pro 已在 v10 实测确认：到达阈值停充生效，且充电图标会自动退出。
 
 ---
 
