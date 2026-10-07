@@ -317,9 +317,9 @@ qsc_power_stop() {
 	if [ -e "$MCA_IF" ]; then
 		mca_cur="$(cat "$MCA_IF" 2>/dev/null | tr -d '\r')"
 		case "$mca_cur" in
-			*"qsc 1"*) ;;
+			*"micharge 1"*) ;;
 			*)
-				if printf 'qsc all 1\n' > "$MCA_IF" 2>/dev/null; then
+				if printf 'micharge all 1\n' > "$MCA_IF" 2>/dev/null; then
 					ok="$ok $MCA_IF"
 					rc=0
 				fi ;;
@@ -357,9 +357,9 @@ qsc_power_start() {
 	if [ -e "$MCA_IF" ]; then
 		mca_cur="$(cat "$MCA_IF" 2>/dev/null | tr -d '\r')"
 		case "$mca_cur" in
-			*"qsc 0"*) ;;
+			*"micharge 0"*) ;;
 			*)
-				if printf 'qsc all 0\n' > "$MCA_IF" 2>/dev/null; then
+				if printf 'micharge all 0\n' > "$MCA_IF" 2>/dev/null; then
 					ok="$ok $MCA_IF"
 					rc=0
 				fi ;;

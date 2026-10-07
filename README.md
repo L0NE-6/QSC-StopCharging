@@ -44,7 +44,7 @@ QSC 定量停充是一个运行在 root 环境下的充电控制模块：
 
 > 其他骁龙机型如果内核暴露了 `/sys/class/qcom-battery/input_suspend`，也有机会直接可用；欢迎在 Issue 里反馈机型和结果。
 >
-> ⏳ 适配中：**小米 17 Pro**（v9 改用 MCA `charge_enable` 直接关充电：`qsc all 0` 停充、`qsc all 1` 恢复，`input_suspend` 作为辅助；等待实机确认）。
+> ⏳ 适配中：**小米 17 Pro**（v10：`charge_enable` 用 `qsc all 0/1` 直接关充电，`input_suspend` 改用 `micharge` 客户端投票让系统上报 `DISCHARGING`、消除充电图标；等待实机确认）。
 
 ---
 
@@ -63,7 +63,7 @@ QSC 定量停充是一个运行在 root 环境下的充电控制模块：
 - [QSC定量停充_安卓5-17适配版_20261004.zip](dist/QSC定量停充_安卓5-17适配版_20261004.zip)
 - [QSC定量停充_安卓1-5遗留root实验版.zip](dist/QSC定量停充_安卓1-5遗留root实验版.zip)
 
-也可以到本仓库的 **Releases** 页面下载。发布按版本分开、依次递增：**v1**（首个版本）、**v2**（qcom-battery，红米 K40 / K50U 实测可用）、**v3**（管理器内更新）、**v4**（修复小米 14 反复充停）、**v5**（扩展节点扫描 + `charge_behaviour`）、**v6**（`charge_control_limit` 尝试）、**v7**（安装后跳转酷安主页）、**v8**（MCA `input_suspend` 适配尝试）、**v9**（当前版本，MCA `charge_enable` 直接关充电修复 17 Pro），后续版本继续递增；`dist/` 目录始终是最新版。
+也可以到本仓库的 **Releases** 页面下载。发布按版本分开、依次递增：**v1**（首个版本）、**v2**（qcom-battery，红米 K40 / K50U 实测可用）、**v3**（管理器内更新）、**v4**（修复小米 14 反复充停）、**v5**（扩展节点扫描 + `charge_behaviour`）、**v6**（`charge_control_limit` 尝试）、**v7**（安装后跳转酷安主页）、**v8**（MCA `input_suspend` 适配尝试）、**v9**（MCA `charge_enable` 直接关充电）、**v10**（当前版本，修复 17 Pro 停充后充电图标不消失），后续版本继续递增；`dist/` 目录始终是最新版。
 
 ---
 
@@ -176,6 +176,12 @@ QSC-StopCharging/
 
 <details>
 <summary>点击展开完整更新日志</summary>
+
+### v10 — 20261004（versionCode 2026100414）
+
+- 修复小米 17 Pro 停充后充电图标不消失：`input_suspend` 投票改用 `micharge` 客户端，内核会据此把电池状态上报为 `DISCHARGING`，系统充电图标随之消失；
+- `charge_enable` 仍用 `qsc` 客户端直接关闭充电；一个负责真正断电，一个负责状态显示；
+- `versionCode`：2026100413 → 2026100414。
 
 ### v9 — 20261004（versionCode 2026100413）
 
