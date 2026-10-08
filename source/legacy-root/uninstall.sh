@@ -1,6 +1,7 @@
 #!/system/bin/sh
 # QSC 遗留模式卸载脚本
 DST=/data/qsc
+dumpsys battery reset >/dev/null 2>&1
 
 if [ -f "$DST/qsc.pid" ]; then
 	oldpid="$(cat "$DST/qsc.pid" 2>/dev/null)"

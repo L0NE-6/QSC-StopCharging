@@ -300,6 +300,17 @@ apply_side() {
 	return 2
 }
 
+hide_icon_enabled() {
+	case "$(conf_get hide_charging_icon)" in
+		1) return 0 ;;
+		0) return 1 ;;
+	esac
+	case " $SWITCH_LIST " in
+		*"/charger.0/stop_charge,start="*) return 0 ;;
+	esac
+	return 1
+}
+
 qsc_power_stop() {
 	ok="$(apply_side stop)"
 	rc=$?
@@ -324,6 +335,9 @@ qsc_power_stop() {
 					rc=0
 				fi ;;
 		esac
+	fi
+	if hide_icon_enabled; then
+		dumpsys battery unplug >/dev/null 2>&1
 	fi
 	if [ "$rc" = "0" ]; then
 		NODE_WARN=0
@@ -365,6 +379,7 @@ qsc_power_start() {
 				fi ;;
 		esac
 	fi
+	dumpsys battery reset >/dev/null 2>&1
 	if [ "$rc" = "0" ]; then
 		NODE_WARN=0
 		log_line "写入恢复充电开关:$ok"

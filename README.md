@@ -64,7 +64,7 @@ QSC 定量停充是一个运行在 root 环境下的充电控制模块：
 - [QSC定量停充_安卓5-17适配版_20261004.zip](dist/QSC定量停充_安卓5-17适配版_20261004.zip)
 - [QSC定量停充_安卓1-5遗留root实验版.zip](dist/QSC定量停充_安卓1-5遗留root实验版.zip)
 
-也可以到本仓库的 **Releases** 页面下载。发布按版本分开、依次递增：**v1**（首个版本）、**v2**（qcom-battery，红米 K40 / K50U 实测可用）、**v3**（管理器内更新）、**v4**（修复小米 14 反复充停）、**v5**（扩展节点扫描 + `charge_behaviour`）、**v6**（`charge_control_limit` 尝试）、**v7**（安装后跳转酷安主页）、**v8**（MCA `input_suspend` 适配尝试）、**v9**（MCA `charge_enable` 直接关充电）、**v10**（当前版本，修复 17 Pro 停充后充电图标不消失），后续版本继续递增；`dist/` 目录始终是最新版。
+也可以到本仓库的 **Releases** 页面下载。发布按版本分开、依次递增：**v1**（首个版本）、**v2**（qcom-battery，红米 K40 / K50U 实测可用）、**v3**（管理器内更新）、**v4**（修复小米 14 反复充停）、**v5**（扩展节点扫描 + `charge_behaviour`）、**v6**（`charge_control_limit` 尝试）、**v7**（安装后跳转酷安主页）、**v8**（MCA `input_suspend` 适配尝试）、**v9**（MCA `charge_enable` 直接关充电）、**v10**（修复 17 Pro 停充后充电图标不消失）、**v11**（当前版本，展锐 `stop_charge` 机型停充后自动隐藏充电标识），后续版本继续递增；`dist/` 目录始终是最新版。
 
 ---
 
@@ -107,6 +107,7 @@ su -c sh /data/local/tmp/qsc/install.sh
 | `temperature_switch` | `1` | `1` = 开启温控停充 |
 | `temperature_switch_stop` | `60` | 电池温度 ≥ 该值（℃）停止充电 |
 | `temperature_switch_start` | `50` | 电池温度 ≤ 该值（℃）恢复充电 |
+| `hide_charging_icon`（可选） | 自动 | 停充后隐藏充电标识；展锐 `stop_charge` 机型默认自动开启，可填 `1` / `0` 强制 |
 
 > 想早点测试：把 `power_stop=80`、`power_start=70`，保存后 3 秒内生效。
 
@@ -177,6 +178,12 @@ QSC-StopCharging/
 
 <details>
 <summary>点击展开完整更新日志</summary>
+
+### v11 — 20261004（versionCode 2026100415）
+
+- 新增 `hide_charging_icon`（默认自动）：展锐 `charger.0/stop_charge` 机型停充后，用 `dumpsys battery unplug` 隐藏充电标识，恢复时 `dumpsys battery reset`；
+- 解决天翼一号 2021（Unisoc UD710）停充后充电标识不消失的问题；
+- `versionCode`：2026100414 → 2026100415。
 
 ### v10 — 20261004（versionCode 2026100414）
 

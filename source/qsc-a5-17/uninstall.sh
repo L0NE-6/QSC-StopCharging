@@ -1,6 +1,7 @@
 #!/system/bin/sh
 # 卸载时停止守护进程，并尽力把常见开关恢复到"允许充电"状态
 MODDIR=${0%/*}
+dumpsys battery reset >/dev/null 2>&1
 
 if [ -f "$MODDIR/qsc.pid" ]; then
 	pid="$(cat "$MODDIR/qsc.pid" 2>/dev/null)"

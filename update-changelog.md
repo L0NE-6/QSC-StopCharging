@@ -1,7 +1,7 @@
-## v10 — 20261004-v10 (versionCode 2026100414)
+## v11 — 20261004-v11 (versionCode 2026100415)
 
-- 修复小米 17 Pro 停充后“充电图标还在”的问题：`input_suspend` 改用 `micharge` 客户端投票，系统会把电池状态上报为 `DISCHARGING`，图标随之消失
-- `charge_enable` 继续用 `qsc` 客户端直接关闭充电（一个负责断电，一个负责状态显示）
+- 新增 `hide_charging_icon`（默认自动）：展锐 `charger.0/stop_charge` 机型停充后自动用 `dumpsys battery unplug` 隐藏充电标识，恢复时 `dumpsys battery reset`
+- 解决天翼一号 2021（Unisoc UD710）停充后充电标识不消失的问题
 - 已实测可用：红米 K40、红米 K50U、小米 14、红米 Note 12 Turbo、小米 17 Pro
 
 完整历史见仓库根目录 `CHANGELOG.md`。

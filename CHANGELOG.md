@@ -1,5 +1,11 @@
 # 更新日志
 
+## v11 — 20261004（versionCode 2026100415）
+
+- 新增 `hide_charging_icon`（默认自动）：展锐 `charger.0/stop_charge` 机型停充后，用 `dumpsys battery unplug` 隐藏充电标识，恢复时 `dumpsys battery reset`；
+- 解决天翼一号 2021（Unisoc UD710）停充后充电标识不消失的问题；
+- `versionCode`：2026100414 → 2026100415。
+
 ## v10 — 20261004（versionCode 2026100414）
 
 - 修复小米 17 Pro 停充后充电图标不消失：`input_suspend` 投票改用 `micharge` 客户端，内核会据此把电池状态上报为 `DISCHARGING`，系统充电图标随之消失；

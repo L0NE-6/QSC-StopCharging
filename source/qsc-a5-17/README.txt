@@ -65,3 +65,4 @@ QSC 定量停充 - 安卓5-17 适配版（20261004 R5）
 14. v8：新增小米17 Pro等 MCA 机型支持（xm_power charge_interface input_suspend，qsc all 1/0）；probe 修正 battery/usb/wireless 属性列举并加入 xm_power 节点。
 15. v9：小米17 Pro 改用 MCA charge_enable 直接关闭充电（qsc all 0 停充 / qsc all 1 恢复），input_suspend 作为辅助，修复「写入成功但仍在充电」。
 16. v10：小米17 Pro 停充后消除充电图标：input_suspend 改用 micharge 客户端投票，系统电池状态上报为 discharging；charge_enable 仍用 qsc 直接关充电。
+17. v11：新增 hide_charging_icon（默认自动）：展锐 stop_charge 机型停充后用 dumpsys battery unplug 隐藏充电标识，恢复时 reset。
