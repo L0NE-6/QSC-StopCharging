@@ -29,4 +29,4 @@ for entry in \
 	[ -e "$p" ] && printf '%s\n' "$v" > "$p" 2>/dev/null
 done
 
-rm -f "$MODDIR/qsc.pid" "$MODDIR/power_switch" "$MODDIR/temp_switch" "$MODDIR/now_c" "$MODDIR/off_qsc" "$MODDIR/off_d"
+rm -f "$MODDIR/qsc.pid" "$MODDIR/power_switch" "$MODDIR/now_c" "$MODDIR/off_qsc" "$MODDIR/off_d"

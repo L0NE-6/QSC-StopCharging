@@ -28,11 +28,6 @@ done
 qsc_perm "$MODPATH/config.conf" 0644
 qsc_perm "$MODPATH/module.prop" 0644
 
-# 独立开关脚本：配合 Anywhere / 快捷方式使用
-printf '%s\n' '#!/system/bin/sh' 'rm -f "${0%/*}/off_qsc"' > "$MODPATH/打开定量停充.sh"
-printf '%s\n' '#!/system/bin/sh' 'touch "${0%/*}/off_qsc"' > "$MODPATH/关闭定量停充.sh"
-qsc_perm "$MODPATH/打开定量停充.sh" 0755
-qsc_perm "$MODPATH/关闭定量停充.sh" 0755
 
 rm -f "$MODPATH/now_c" "$MODPATH/off_d" "$MODPATH/power_on" "$MODPATH/power_off" "$MODPATH/qsc.pid" "$MODPATH/.fail_warn"
 

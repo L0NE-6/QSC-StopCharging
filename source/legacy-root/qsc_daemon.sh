@@ -10,7 +10,6 @@ PIDFILE="$MODDIR/qsc.pid"
 LOG="$MODDIR/log.log"
 NOW_C="$MODDIR/now_c"
 POWER_SWITCH="$MODDIR/power_switch"
-TEMP_SWITCH="$MODDIR/temp_switch"
 # ---------------- Android 5-11 兼容：busybox 兜底 ----------------
 BUSYBOX=""
 for p in /data/adb/magisk/busybox /data/adb/ksu/bin/busybox /system/xbin/busybox /system/bin/busybox /sbin/busybox; do
@@ -60,9 +59,6 @@ load_config() {
 	POWER_STOP_TIME="$(conf_get_or power_stop_time 3)"
 	CHARGE_FULL="$(conf_get_or charge_full 0)"
 	POWER_RESET="$(conf_get_or power_reset 0)"
-	TEMP_ENABLE="$(conf_get_or temperature_switch 1)"
-	TEMP_STOP="$(conf_get_or temperature_switch_stop 60)"
-	TEMP_START="$(conf_get_or temperature_switch_start 50)"
 }
 
 log_line() {
@@ -72,10 +68,10 @@ log_line() {
 CONFIG_SIG=""
 
 update_config_log() {
-	new_sig="$POWER_STOP|$POWER_START|$POWER_STOP_TIME|$CHARGE_FULL|$POWER_RESET|$TEMP_ENABLE|$TEMP_STOP|$TEMP_START"
+	new_sig="$POWER_STOP|$POWER_START|$POWER_STOP_TIME|$CHARGE_FULL|$POWER_RESET"
 	[ "$new_sig" = "$CONFIG_SIG" ] && return
 	if [ -n "$CONFIG_SIG" ]; then
-		log_line "配置已更新: 停止电量=$POWER_STOP 恢复电量=$POWER_START 延时=$POWER_STOP_TIME charge_full=$CHARGE_FULL power_reset=$POWER_RESET 温控=$TEMP_ENABLE 停止温度=$TEMP_STOP 恢复温度=$TEMP_START"
+		log_line "配置已更新: 停止电量=$POWER_STOP 恢复电量=$POWER_START 延时=$POWER_STOP_TIME charge_full=$CHARGE_FULL power_reset=$POWER_RESET"
 	fi
 	CONFIG_SIG="$new_sig"
 }
@@ -101,14 +97,12 @@ set_state() {
 # ---------------- 电池状态读取 ----------------
 read_battery() {
 	BAT_LEVEL=""
-	BAT_TEMP=""
 	BAT_STATUS=""
 	BAT_POWERED=""
 	BAT_CHARGING=0
 
 	dbat="$(dumpsys battery 2>/dev/null)"
 	BAT_LEVEL="$(printf '%s\n' "$dbat" | sed -n 's/^[[:space:]]*level: *\([0-9][0-9]*\).*/\1/p' | head -n 1)"
-	BAT_TEMP="$(printf '%s\n' "$dbat" | sed -n 's/^[[:space:]]*temperature: *\([-0-9][0-9]*\).*/\1/p' | head -n 1)"
 	BAT_STATUS="$(printf '%s\n' "$dbat" | sed -n 's/^[[:space:]]*status: *\([0-9][0-9]*\).*/\1/p' | head -n 1)"
 	case "$dbat" in
 		*"AC powered: true"*|*"USB powered: true"*|*"Wireless powered: true"*|*"Dock powered: true"*)
@@ -120,19 +114,7 @@ read_battery() {
 		BAT_LEVEL="$(cat /sys/class/power_supply/battery/capacity 2>/dev/null)"
 		case "$BAT_LEVEL" in ''|*[!0-9]*) BAT_LEVEL="" ;; esac
 	fi
-	if [ -z "$BAT_TEMP" ]; then
-		for t in /sys/class/power_supply/battery/temp /sys/class/power_supply/battery/batt_temp; do
-			if [ -r "$t" ]; then
-				BAT_TEMP="$(cat "$t" 2>/dev/null)"
-				break
-			fi
-		done
-	fi
-	# dumpsys/sysfs 的温度单位均为 0.1 摄氏度，统一换算成整数摄氏度
-	case "$BAT_TEMP" in
-		''|*[!0-9-]*) BAT_TEMP="" ;;
-		*) BAT_TEMP="$((BAT_TEMP / 10))" ;;
-	esac
+
 	if [ -z "$BAT_STATUS" ] && [ -r /sys/class/power_supply/battery/status ]; then
 		BAT_STATUS="$(cat /sys/class/power_supply/battery/status 2>/dev/null)"
 	fi
@@ -400,12 +382,11 @@ dumpsys battery reset >/dev/null 2>&1
 rm -f "$NOW_C"
 load_config
 update_config_log
-log_line "启动: 停止电量=$POWER_STOP 恢复电量=$POWER_START 延时=$POWER_STOP_TIME charge_full=$CHARGE_FULL power_reset=$POWER_RESET 温控=$TEMP_ENABLE 停止温度=$TEMP_STOP 恢复温度=$TEMP_START"
+log_line "启动: 停止电量=$POWER_STOP 恢复电量=$POWER_START 延时=$POWER_STOP_TIME charge_full=$CHARGE_FULL power_reset=$POWER_RESET"
 build_switch_list
 [ -n "$SWITCH_LIST" ] || log_line "开机扫描未发现充电开关节点，将持续重新扫描"
 
 LOOP=0
-TEMP_MARK="$TEMP_SWITCH"
 NODE_WARN=0
 
 # ---------------- 主循环 ----------------
@@ -415,7 +396,7 @@ while true; do
 	update_config_log
 	read_battery
 
-	if [ -z "$BAT_LEVEL" ] || [ -z "$BAT_TEMP" ]; then
+	if [ -z "$BAT_LEVEL" ]; then
 		sleep 3
 		continue
 	fi
@@ -430,43 +411,27 @@ while true; do
 		off_qsc=1
 		POWER_STOP_NOW=110
 		POWER_START_NOW=105
-		TEMP_ENABLE_NOW=0
 		if [ ! -f "$MODDIR/off_d" ]; then
 			set_state "模块已关闭"
 			touch "$MODDIR/off_d"
-			log_line "检测到关闭开关，模块暂停（删除off_qsc或运行 打开定量停充.sh 恢复）"
+			log_line "检测到关闭开关，模块暂停（删除 off_qsc 或再点一次模块执行按钮恢复）"
 			rm -f "$NOW_C" "$MODDIR/power_on" "$MODDIR/power_off"
 		fi
 	else
 		POWER_STOP_NOW="$POWER_STOP"
 		POWER_START_NOW="$POWER_START"
-		TEMP_ENABLE_NOW="$TEMP_ENABLE"
 		if [ -f "$MODDIR/off_d" ]; then
 			rm -f "$MODDIR/off_d"
 			log_line "模块已重新开启"
 		fi
 	fi
 
-	battery_status_data=0
 	switch_stop_mode=0
-	log_log=0
-	cpu_log=0
-	log_log2=0
-	cpu_log2=0
 	full_log=0
 	reset_log=0
 
 	if [ "$BAT_CHARGING" = "1" ]; then
-		battery_status_data=1
 		rotate_log
-
-		# 温控停止
-		if [ "$TEMP_ENABLE_NOW" = "1" ]; then
-			if [ "$TEMP_STOP" -gt "$TEMP_START" ] && [ "$BAT_TEMP" -ge "$TEMP_STOP" ]; then
-				touch "$TEMP_MARK"
-				cpu_log=1
-			fi
-		fi
 
 		# 电量停止
 		if [ "$POWER_STOP_NOW" -gt "$POWER_START_NOW" ] && [ "$BAT_LEVEL" -ge "$POWER_STOP_NOW" ]; then
@@ -517,8 +482,8 @@ while true; do
 		fi
 
 		# 执行停止充电
-		if [ "$switch_stop_mode" = "1" ] || [ "$cpu_log" = "1" ]; then
-			if [ "$cpu_log" = "0" ] && [ "$CHARGE_FULL" != "1" ] && [ ! -f "$POWER_SWITCH" ]; then
+		if [ "$switch_stop_mode" = "1" ]; then
+			if [ "$CHARGE_FULL" != "1" ] && [ ! -f "$POWER_SWITCH" ]; then
 				if [ "$POWER_STOP_TIME" -gt "0" ]; then
 					log_line "电量$BAT_LEVEL 延时功能 继续充电$POWER_STOP_TIME秒 倒计时中"
 					sleep "$POWER_STOP_TIME"
@@ -529,11 +494,7 @@ while true; do
 			rc=$?
 			touch "$POWER_SWITCH"
 			if [ "$rc" = "0" ]; then
-				if [ "$cpu_log" = "1" ]; then
-					log_line "电量$BAT_LEVEL 触发开关温控：停止充电 温度$BAT_TEMP"
-				else
-					log_line "电量$BAT_LEVEL 停止充电"
-				fi
+				log_line "电量$BAT_LEVEL 停止充电"
 			fi
 		else
 			reset_log=1
@@ -559,25 +520,13 @@ while true; do
 
 	# 恢复充电
 	if [ -f "$POWER_SWITCH" ]; then
-		if [ "$BAT_LEVEL" -le "$POWER_START_NOW" ] || [ -f "$TEMP_MARK" ]; then
-			if [ "$TEMP_ENABLE_NOW" = "1" ] && [ -f "$TEMP_MARK" ]; then
-				if [ "$BAT_TEMP" -gt "$TEMP_START" ]; then
-					sleep 3
-					continue
-				fi
-				cpu_log2=1
-			fi
+		if [ "$BAT_LEVEL" -le "$POWER_START_NOW" ]; then
 			sleep 3
 			qsc_power_start
 			rc=$?
-			rm -f "$TEMP_MARK"
 			rm -f "$POWER_SWITCH"
 			if [ "$rc" = "0" ]; then
-				if [ "$cpu_log2" = "1" ]; then
-					log_line "电量$BAT_LEVEL 触发开关温控：恢复充电 温度$BAT_TEMP"
-				else
-					log_line "电量$BAT_LEVEL 恢复充电"
-				fi
+				log_line "电量$BAT_LEVEL 恢复充电"
 			fi
 		fi
 	fi

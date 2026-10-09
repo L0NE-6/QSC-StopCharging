@@ -4,7 +4,7 @@
 
 **Magisk / KernelSU / APatch 充电阈值控制模块 · 纯本地脚本 · 无联网**
 
-到达指定电量或温度自动停止充电，低于恢复阈值自动恢复充电 · 配置热重载，改完即生效
+到达指定电量自动停止充电，低于恢复阈值自动恢复充电 · 配置热重载，改完即生效
 
 <img src="https://img.shields.io/badge/Android-5.0%20~%2017-3DDC84?style=for-the-badge&logo=android&logoColor=white" />
 <img src="https://img.shields.io/badge/Magisk-%E2%89%A520.4-00AF9A?style=for-the-badge" />
@@ -23,7 +23,6 @@ QSC 定量停充是一个运行在 root 环境下的充电控制模块：
 
 - 电量达到 **停止电量**（默认 100%）→ 写入内核充电开关节点，停止充电；
 - 电量降到 **恢复电量**（默认 95%）→ 自动恢复充电；
-- 电池温度达到 **停止温度**（默认 60℃）→ 停止充电，降到 **恢复温度**（默认 50℃）→ 恢复充电；
 - `config.conf` 每 3 秒热重载一次，改完立即生效，不用重启。
 - 支持管理器内更新：内置 `updateJson`，在 Magisk / KernelSU / APatch 管理器里可直接检测并安装新版本（v3 起）。
 
@@ -65,7 +64,7 @@ QSC 定量停充是一个运行在 root 环境下的充电控制模块：
 - [QSC定量停充_安卓5-17适配版_20261004.zip](dist/QSC定量停充_安卓5-17适配版_20261004.zip)
 - [QSC定量停充_安卓1-5遗留root实验版.zip](dist/QSC定量停充_安卓1-5遗留root实验版.zip)
 
-也可以到本仓库的 **Releases** 页面下载。发布按版本分开、依次递增：**v1**（首个版本）、**v2**（qcom-battery，红米 K40 / K50U 实测可用）、**v3**（管理器内更新）、**v4**（修复小米 14 反复充停）、**v5**（扩展节点扫描 + `charge_behaviour`）、**v6**（`charge_control_limit` 尝试）、**v7**（安装后跳转酷安主页）、**v8**（MCA `input_suspend` 适配尝试）、**v9**（MCA `charge_enable` 直接关充电）、**v10**（修复 17 Pro 停充后充电图标不消失）、**v11**（展锐 `stop_charge` 机型停充后自动隐藏充电标识）、**v12**（当前版本，修复隐藏充电标识后系统电量显示冻结、无法按阈值恢复充电的问题），后续版本继续递增；`dist/` 目录始终是最新版。
+也可以到本仓库的 **Releases** 页面下载。发布按版本分开、依次递增：**v1**（首个版本）、**v2**（qcom-battery，红米 K40 / K50U 实测可用）、**v3**（管理器内更新）、**v4**（修复小米 14 反复充停）、**v5**（扩展节点扫描 + `charge_behaviour`）、**v6**（`charge_control_limit` 尝试）、**v7**（安装后跳转酷安主页）、**v8**（MCA `input_suspend` 适配尝试）、**v9**（MCA `charge_enable` 直接关充电）、**v10**（修复 17 Pro 停充后充电图标不消失）、**v11**（展锐 `stop_charge` 机型停充后自动隐藏充电标识）、**v12**（修复隐藏充电标识后电量显示冻结）、**v13**（当前版本，移除温控 + 合并开关脚本，管理器执行按钮点一次开、再点一次关），后续版本继续递增；`dist/` 目录始终是最新版。
 
 ---
 
@@ -105,9 +104,7 @@ su -c sh /data/local/tmp/qsc/install.sh
 | `power_stop_time` | `3` | 触发停充前继续充电的秒数（仅大于 0 的整数）；倒计时开始后无法中止 |
 | `charge_full` | `0` | `1` = 充满再停：100% 后等电流小于 100mA 再停充（开启后延时功能自动失效） |
 | `power_reset` | `0` | `1` = 每次充电自动拔插一次，用于激活部分机型的快充 |
-| `temperature_switch` | `1` | `1` = 开启温控停充 |
-| `temperature_switch_stop` | `60` | 电池温度 ≥ 该值（℃）停止充电 |
-| `temperature_switch_start` | `50` | 电池温度 ≤ 该值（℃）恢复充电 |
+
 | `hide_charging_icon`（可选） | 自动 | 停充后隐藏充电标识；展锐 `stop_charge` 机型默认自动开启，可填 `1` / `0` 强制 |
 
 > 想早点测试：把 `power_stop=80`、`power_start=70`，保存后 3 秒内生效。
@@ -118,9 +115,9 @@ su -c sh /data/local/tmp/qsc/install.sh
 
 **临时关闭 / 恢复（现代版）**
 
-- 关闭：创建文件 `/data/adb/modules/QuantitativeStopCharging_switch/off_qsc`
-- 恢复：删除该文件，或运行模块目录下的 `打开定量停充.sh` / `关闭定量停充.sh`
-- 管理器里的「执行」按钮：启用模块并显示当前状态、配置与最近日志
+- 管理器里的「执行」按钮：点一次开启，再点一次关闭（并显示状态、配置与最近日志）
+- 关闭：创建文件 `/data/adb/modules/QuantitativeStopCharging_switch/off_qsc`（或点执行按钮）
+- 恢复：删除该文件（或再点一次执行按钮）
 
 **临时关闭 / 恢复（遗留版）**
 
@@ -145,7 +142,7 @@ su -c sh /data/qsc/probe.sh
 
 | 现象 | 原因 / 处理 |
 | :--- | :--- |
-| 日志出现「检测到关闭开关，模块暂停」 | 删除 `off_qsc` 或运行 `打开定量停充.sh` |
+| 日志出现「检测到关闭开关，模块暂停」 | 删除 `off_qsc`，或再点一次模块「执行」按钮 |
 | 日志出现「未找到可用的充电开关节点」 | 内核没有暴露可写节点，运行 `probe.sh` 检查 |
 | 日志写入了节点但电量仍上升 | 该节点切不断充电，需要按 `probe.log` 找其它节点 |
 | 日志出现「节点写入失败」 | SELinux / 权限拦截，`probe.log` 里 `writable:no` 可确认 |
@@ -179,6 +176,13 @@ QSC-StopCharging/
 
 <details>
 <summary>点击展开完整更新日志</summary>
+
+### v13 — 20261004（versionCode 2026100417）
+
+- 移除温控停充功能：不再按电池温度停止 / 恢复充电（充电火力全开）；
+- 移除 `打开定量停充.sh` / `关闭定量停充.sh`：管理器「执行」按钮改为点一次开启、再点一次关闭；
+- 清理温度相关代码与无用变量（`TEMP_*`、`BAT_TEMP`、`cpu_log*`、`log_log*` 等）；
+- `versionCode`：2026100416 → 2026100417。
 
 ### v12 — 20261004（versionCode 2026100416）
 

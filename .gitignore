@@ -9,7 +9,6 @@ off_d
 power_on
 power_off
 power_switch
-temp_switch
 now_c
 .bbin/
 .fail_warn
