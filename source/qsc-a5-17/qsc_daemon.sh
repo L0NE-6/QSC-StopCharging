@@ -11,6 +11,9 @@ LOG="$MODDIR/log.log"
 NOW_C="$MODDIR/now_c"
 POWER_SWITCH="$MODDIR/power_switch"
 TEMP_SWITCH="$MODDIR/temp_switch"
+# 隐藏充电标识的模拟状态（dumpsys battery unplug）；部分机型在该状态下会冻结 dumpsys 电量
+ICON_SIM=0
+ICON_LEVEL_LAST=""
 # ---------------- Android 5-11 兼容：busybox 兜底 ----------------
 BUSYBOX=""
 for p in /data/adb/magisk/busybox /data/adb/ksu/bin/busybox /system/xbin/busybox /system/bin/busybox /sbin/busybox; do
@@ -106,6 +109,12 @@ read_battery() {
 	BAT_POWERED=""
 	BAT_CHARGING=0
 
+	sys_level=""
+	if [ -r /sys/class/power_supply/battery/capacity ]; then
+		sys_level="$(cat /sys/class/power_supply/battery/capacity 2>/dev/null | tr -d '\r\n')"
+		case "$sys_level" in ''|*[!0-9]*) sys_level="" ;; esac
+	fi
+
 	dbat="$(dumpsys battery 2>/dev/null)"
 	BAT_LEVEL="$(printf '%s\n' "$dbat" | sed -n 's/^[[:space:]]*level: *\([0-9][0-9]*\).*/\1/p' | head -n 1)"
 	BAT_TEMP="$(printf '%s\n' "$dbat" | sed -n 's/^[[:space:]]*temperature: *\([-0-9][0-9]*\).*/\1/p' | head -n 1)"
@@ -115,10 +124,12 @@ read_battery() {
 			BAT_POWERED=1 ;;
 	esac
 
-	# dumpsys 异常时回退 sysfs
-	if [ -z "$BAT_LEVEL" ] && [ -r /sys/class/power_supply/battery/capacity ]; then
-		BAT_LEVEL="$(cat /sys/class/power_supply/battery/capacity 2>/dev/null)"
-		case "$BAT_LEVEL" in ''|*[!0-9]*) BAT_LEVEL="" ;; esac
+	# 隐藏充电标识期间（dumpsys battery unplug）部分机型会冻结 dumpsys 电量，
+	# 此时优先 sysfs 真实电量；dumpsys 异常时同样回退 sysfs。
+	if [ "$ICON_SIM" = "1" ] && [ -n "$sys_level" ]; then
+		BAT_LEVEL="$sys_level"
+	elif [ -z "$BAT_LEVEL" ] && [ -n "$sys_level" ]; then
+		BAT_LEVEL="$sys_level"
 	fi
 	if [ -z "$BAT_TEMP" ]; then
 		for t in /sys/class/power_supply/battery/temp /sys/class/power_supply/battery/batt_temp; do
@@ -152,6 +163,16 @@ read_battery() {
 		'')
 			[ "$BAT_POWERED" = "1" ] && BAT_CHARGING=1 ;;
 	esac
+}
+
+# 隐藏充电标识期间，把 sysfs 真实电量同步给系统显示（unplug 后部分机型显示会冻结）
+sync_icon_level() {
+	[ "$ICON_SIM" = "1" ] || return
+	[ -n "$BAT_LEVEL" ] || return
+	[ "$BAT_LEVEL" = "$ICON_LEVEL_LAST" ] && return
+	if dumpsys battery set level "$BAT_LEVEL" >/dev/null 2>&1; then
+		ICON_LEVEL_LAST="$BAT_LEVEL"
+	fi
 }
 
 # ---------------- 充电开关节点管理 ----------------
@@ -337,7 +358,10 @@ qsc_power_stop() {
 		esac
 	fi
 	if hide_icon_enabled; then
-		dumpsys battery unplug >/dev/null 2>&1
+		if dumpsys battery unplug >/dev/null 2>&1; then
+			ICON_SIM=1
+			ICON_LEVEL_LAST=""
+		fi
 	fi
 	if [ "$rc" = "0" ]; then
 		NODE_WARN=0
@@ -380,6 +404,8 @@ qsc_power_start() {
 		esac
 	fi
 	dumpsys battery reset >/dev/null 2>&1
+	ICON_SIM=0
+	ICON_LEVEL_LAST=""
 	if [ "$rc" = "0" ]; then
 		NODE_WARN=0
 		log_line "写入恢复充电开关:$ok"
@@ -397,6 +423,8 @@ do_power_reset() {
 
 # ---------------- 初始化 ----------------
 dumpsys battery reset >/dev/null 2>&1
+ICON_SIM=0
+ICON_LEVEL_LAST=""
 rm -f "$NOW_C"
 load_config
 update_config_log
@@ -414,6 +442,7 @@ while true; do
 	load_config
 	update_config_log
 	read_battery
+	sync_icon_level
 
 	if [ -z "$BAT_LEVEL" ] || [ -z "$BAT_TEMP" ]; then
 		sleep 3
