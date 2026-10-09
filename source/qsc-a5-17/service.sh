@@ -23,31 +23,57 @@ if [ -f "$MODDIR/qsc.pid" ]; then
 fi
 
 # 首次安装/更新后，跳转酷安主页（有酷安 App 用 App，没有则用浏览器）
-if [ ! -f "$MODDIR/.welcome_shown" ]; then
+# 只有确认打开成功才写 .welcome_shown_v2；失败会在本次开机重试，并在下次开机继续尝试
+if [ ! -f "$MODDIR/.welcome_shown_v2" ]; then
 	(
+		wlog() { echo "$(date +%F_%T) $*" >> "$MODDIR/welcome.log"; }
+		wlog "wait boot_completed..."
 		i=0
-		while [ "$(getprop sys.boot_completed 2>/dev/null)" != "1" ] && [ "$i" -lt 60 ]; do
+		while [ "$(getprop sys.boot_completed 2>/dev/null)" != "1" ] && [ "$i" -lt 90 ]; do
 			sleep 2
 			i=$((i + 1))
 		done
-		sleep 5
+		sleep 15
 		URL="https://www.coolapk.com/u/1429422"
-		if pm list packages 2>/dev/null | grep -q "com.coolapk.market"; then
-			opened=0
-			for uri in "coolmarket://user/1429422" "coolmarket://u/1429422" "$URL"; do
-				out="$(am start -a android.intent.action.VIEW -d "$uri" -p com.coolapk.market 2>&1)"
+		opened=0
+		attempt=0
+		while [ "$attempt" -lt 3 ] && [ "$opened" != "1" ]; do
+			attempt=$((attempt + 1))
+			if pm list packages 2>/dev/null | grep -q "com.coolapk.market"; then
+				wlog "attempt $attempt: coolapk installed"
+				for uri in "coolmarket://user/1429422" "coolmarket://u/1429422" "$URL"; do
+					out="$(am start --user 0 -a android.intent.action.VIEW -d "$uri" -p com.coolapk.market 2>&1)"
+					wlog "  $uri => $out"
+					case "$out" in
+						*Error*|*Exception*|*unable*|*not\ found*|*Permission*) ;;
+						*) opened=1; break ;;
+					esac
+				done
+				if [ "$opened" != "1" ]; then
+					out="$(am start --user 0 -a android.intent.action.VIEW -d "$URL" 2>&1)"
+					wlog "  browser fallback => $out"
+					case "$out" in
+						*Error*|*Exception*|*unable*|*not\ found*|*Permission*) ;;
+						*) opened=1 ;;
+					esac
+				fi
+			else
+				wlog "attempt $attempt: coolapk not installed, use browser"
+				out="$(am start --user 0 -a android.intent.action.VIEW -d "$URL" 2>&1)"
+				wlog "  browser => $out"
 				case "$out" in
-					*Error*|*Exception*|*unable*|*not\ found*) ;;
-					*) opened=1; break ;;
+					*Error*|*Exception*|*unable*|*not\ found*|*Permission*) ;;
+					*) opened=1 ;;
 				esac
-			done
-			if [ "$opened" != "1" ]; then
-				am start -a android.intent.action.VIEW -d "$URL" >/dev/null 2>&1
 			fi
+			[ "$opened" = "1" ] || sleep 20
+		done
+		if [ "$opened" = "1" ]; then
+			touch "$MODDIR/.welcome_shown_v2"
+			wlog "opened ok"
 		else
-			am start -a android.intent.action.VIEW -d "$URL" >/dev/null 2>&1
+			wlog "open failed, will retry next boot"
 		fi
-		touch "$MODDIR/.welcome_shown"
 	) &
 fi
 

@@ -1,7 +1,7 @@
 id=QuantitativeStopCharging_switch
 name=QSC定量停充_独立开关版_安卓5-17适配
-version=20261004-v13
-versionCode=2026100417
+version=20261004-v14
+versionCode=2026100418
 author=单走一个6
 description=[ 未知状态 ] 到达指定电量自动停止充电、自动恢复充电，配置路径：/data/adb/modules/QuantitativeStopCharging_switch/config.conf，日志log.log。支持管理器内更新。安卓1-5老系统请用遗留root实验版。
 updateJson=https://raw.githubusercontent.com/L0NE-6/QSC-StopCharging/main/update.json
