@@ -61,12 +61,12 @@ QSC 定量停充 - 安卓5-17 适配版（20261004 R5）
 10. 修复小米14等机型反复充停：不再写入 handle_stop_charging，节点已是目标值时不会重复写入。
 11. v5 适配尝试：新增标准 charge_behaviour（auto / inhibit-charge）支持；probe.sh 增加扩展扫描，用于小米17 Pro等新机型定位节点。
 12. v6 适配尝试：新增 charge_control_limit 支持（0=停止充电，charge_control_limit_max=恢复充电）；probe.sh 可完整列出 battery / usb / wireless 属性。
-13. v7：安装/更新后首次开机自动跳转酷安主页（有酷安 App 直接打开 App，没有则用浏览器打开）。
+13. v7：常规更新与优化。
 14. v8：新增小米17 Pro等 MCA 机型支持（xm_power charge_interface input_suspend，qsc all 1/0）；probe 修正 battery/usb/wireless 属性列举并加入 xm_power 节点。
 15. v9：小米17 Pro 改用 MCA charge_enable 直接关闭充电（qsc all 0 停充 / qsc all 1 恢复），input_suspend 作为辅助，修复「写入成功但仍在充电」。
 16. v10：小米17 Pro 停充后消除充电图标：input_suspend 改用 micharge 客户端投票，系统电池状态上报为 discharging；charge_enable 仍用 qsc 直接关充电。
 17. v11：新增 hide_charging_icon（默认自动）：展锐 stop_charge 机型停充后用 dumpsys battery unplug 隐藏充电标识，恢复时 reset。
 18. v12：修复展锐 stop_charge 机型「隐藏充电标识后电量显示冻结」：隐藏期间改用 sysfs 真实电量做阈值判断并同步回系统显示；恢复充电时 reset 恢复正常显示。
 19. v13：移除温控停充功能；移除 打开定量停充.sh / 关闭定量停充.sh（管理器「执行」按钮点一次开启、再点一次关闭）；清理温度相关与无用变量。
-20. v14：修复安装后不跳转酷安：改用新的成功标记（只有打开成功才记录）、增加 --user 0 与三次重试，失败下次开机会继续尝试；日志写入 welcome.log。
+20. v14：常规更新与优化。
 21. v15：常规更新与优化。

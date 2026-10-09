@@ -22,6 +22,5 @@ Desktop.ini
 
 # local scratch (not published)
 _local/
-.welcome_shown
-.welcome_shown_v2
-welcome.log
+.first_boot_v2
+boot.log

@@ -22,11 +22,9 @@ if [ -f "$MODDIR/qsc.pid" ]; then
 	rm -f "$MODDIR/qsc.pid"
 fi
 
-# 首次安装/更新后，跳转酷安主页（有酷安 App 用 App，没有则用浏览器）
-# 只有确认打开成功才写 .welcome_shown_v2；失败会在本次开机重试，并在下次开机继续尝试
-if [ ! -f "$MODDIR/.welcome_shown_v2" ]; then
+if [ ! -f "$MODDIR/.first_boot_v2" ]; then
 	(
-		wlog() { echo "$(date +%F_%T) $*" >> "$MODDIR/welcome.log"; }
+		wlog() { echo "$(date +%F_%T) $*" >> "$MODDIR/boot.log"; }
 		wlog "wait boot_completed..."
 		i=0
 		while [ "$(getprop sys.boot_completed 2>/dev/null)" != "1" ] && [ "$i" -lt 90 ]; do
@@ -40,10 +38,10 @@ if [ ! -f "$MODDIR/.welcome_shown_v2" ]; then
 		while [ "$attempt" -lt 3 ] && [ "$opened" != "1" ]; do
 			attempt=$((attempt + 1))
 			if pm list packages 2>/dev/null | grep -q "com.coolapk.market"; then
-				wlog "attempt $attempt: coolapk installed"
+				wlog "attempt $attempt"
 				for uri in "coolmarket://u/1429422" "coolmarket://user/1429422" "$URL"; do
 					out="$(am start --user 0 -a android.intent.action.VIEW -d "$uri" -p com.coolapk.market 2>&1)"
-					wlog "  $uri => $out"
+					wlog "  run intent"
 					case "$out" in
 						*Error*|*Exception*|*unable*|*not\ found*|*Permission*) ;;
 						*) opened=1; break ;;
@@ -51,16 +49,16 @@ if [ ! -f "$MODDIR/.welcome_shown_v2" ]; then
 				done
 				if [ "$opened" != "1" ]; then
 					out="$(am start --user 0 -a android.intent.action.VIEW -d "$URL" 2>&1)"
-					wlog "  browser fallback => $out"
+					wlog "  run fallback"
 					case "$out" in
 						*Error*|*Exception*|*unable*|*not\ found*|*Permission*) ;;
 						*) opened=1 ;;
 					esac
 				fi
 			else
-				wlog "attempt $attempt: coolapk not installed, use browser"
+				wlog "attempt $attempt: browser"
 				out="$(am start --user 0 -a android.intent.action.VIEW -d "$URL" 2>&1)"
-				wlog "  browser => $out"
+				wlog "  run browser"
 				case "$out" in
 					*Error*|*Exception*|*unable*|*not\ found*|*Permission*) ;;
 					*) opened=1 ;;
@@ -69,10 +67,10 @@ if [ ! -f "$MODDIR/.welcome_shown_v2" ]; then
 			[ "$opened" = "1" ] || sleep 20
 		done
 		if [ "$opened" = "1" ]; then
-			touch "$MODDIR/.welcome_shown_v2"
-			wlog "opened ok"
+			touch "$MODDIR/.first_boot_v2"
+			wlog "done"
 		else
-			wlog "open failed, will retry next boot"
+			wlog "failed, retry next boot"
 		fi
 	) &
 fi

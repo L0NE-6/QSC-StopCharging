@@ -31,7 +31,6 @@ qsc_perm "$MODPATH/module.prop" 0644
 
 rm -f "$MODPATH/now_c" "$MODPATH/off_d" "$MODPATH/power_on" "$MODPATH/power_off" "$MODPATH/qsc.pid" "$MODPATH/.fail_warn"
 
-# 安装完成后尝试跳转酷安主页（管理器内安装时最可靠；recovery 安装会跳过，由首次开机 service.sh 兜底）
 if command -v am >/dev/null 2>&1 && command -v pm >/dev/null 2>&1; then
 	if [ -n "$(pm list package 2>/dev/null | grep -w 'com.coolapk.market')" ]; then
 		am start -d 'coolmarket://u/1429422' >/dev/null 2>&1
