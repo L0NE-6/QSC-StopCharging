@@ -34,14 +34,14 @@ if [ ! -f "$MODDIR/.welcome_shown_v2" ]; then
 			i=$((i + 1))
 		done
 		sleep 15
-		URL="https://www.coolapk.com/u/1429422"
+		URL="http://www.coolapk.com/u/1429422"
 		opened=0
 		attempt=0
 		while [ "$attempt" -lt 3 ] && [ "$opened" != "1" ]; do
 			attempt=$((attempt + 1))
 			if pm list packages 2>/dev/null | grep -q "com.coolapk.market"; then
 				wlog "attempt $attempt: coolapk installed"
-				for uri in "coolmarket://user/1429422" "coolmarket://u/1429422" "$URL"; do
+				for uri in "coolmarket://u/1429422" "coolmarket://user/1429422" "$URL"; do
 					out="$(am start --user 0 -a android.intent.action.VIEW -d "$uri" -p com.coolapk.market 2>&1)"
 					wlog "  $uri => $out"
 					case "$out" in
