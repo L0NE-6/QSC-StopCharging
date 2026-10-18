@@ -39,6 +39,7 @@ QSC 定量停充是一个运行在 root 环境下的充电控制模块：
 | 红米 K40 | ✅ 可用 | 骁龙平台 `qcom-battery/input_suspend` 节点 |
 | 红米 K50U | ✅ 可用 | 骁龙平台 `qcom-battery/input_suspend` 节点 |
 | 小米 14 | ✅ 可用 | 骁龙平台 `qcom-battery/input_suspend` 节点；v4 修复反复充停 |
+| 小米 13（fuxi） | ✅ 可用 | 骁龙平台 `qcom-battery/input_suspend`；v16 修复 `charge_control_limit` 恢复写入失败（issue #4 日志实测） |
 | 红米 Note 12 Turbo | ✅ 可用 | 用户实测反馈可用 |
 | 小米 17 Pro | ✅ 可用 | MCA `xm_power`：`charge_enable` 关充电 + `input_suspend` 改状态显示；v10 起停充后充电图标也会消失 |
 | 天翼一号 2021（TYH211U） | ✅ 可用 | 展锐 UD710；`charger.0/stop_charge` 停充 + `dumpsys battery unplug` 隐藏标识；v12 修复电量显示冻结，改用 sysfs `capacity` 读真实电量 |
@@ -64,7 +65,7 @@ QSC 定量停充是一个运行在 root 环境下的充电控制模块：
 - [QSC定量停充_安卓5-17适配版_20261004.zip](dist/QSC定量停充_安卓5-17适配版_20261004.zip)
 - [QSC定量停充_安卓1-5遗留root实验版.zip](dist/QSC定量停充_安卓1-5遗留root实验版.zip)
 
-也可以到本仓库的 **Releases** 页面下载。发布按版本分开、依次递增：**v1**（首个版本）、**v2**（qcom-battery，红米 K40 / K50U 实测可用）、**v3**（管理器内更新）、**v4**（修复小米 14 反复充停）、**v5**（扩展节点扫描 + `charge_behaviour`）、**v6**（`charge_control_limit` 尝试）、**v7**（常规更新）、**v8**（MCA `input_suspend` 适配尝试）、**v9**（MCA `charge_enable` 直接关充电）、**v10**（修复 17 Pro 停充后充电图标不消失）、**v11**（展锐 `stop_charge` 机型停充后自动隐藏充电标识）、**v12**（修复隐藏充电标识后电量显示冻结）、**v13**（移除温控 + 合并开关脚本）、**v14**（常规更新）、**v15**（当前版本，常规更新与优化），后续版本继续递增；`dist/` 目录始终是最新版。
+也可以到本仓库的 **Releases** 页面下载。发布按版本分开、依次递增：**v1**（首个版本）、**v2**（qcom-battery，红米 K40 / K50U 实测可用）、**v3**（管理器内更新）、**v4**（修复小米 14 反复充停）、**v5**（扩展节点扫描 + `charge_behaviour`）、**v6**（`charge_control_limit` 尝试）、**v7**（常规更新）、**v8**（MCA `input_suspend` 适配尝试）、**v9**（MCA `charge_enable` 直接关充电）、**v10**（修复 17 Pro 停充后充电图标不消失）、**v11**（展锐 `stop_charge` 机型停充后自动隐藏充电标识）、**v12**（修复隐藏充电标识后电量显示冻结）、**v13**（移除温控 + 合并开关脚本）、**v14**（常规更新）、**v15**（常规更新与优化）、**v16**（移除 `charge_control_limit` 误写，当前版本），后续版本继续递增；`dist/` 目录始终是最新版。
 
 ---
 
@@ -176,6 +177,14 @@ QSC-StopCharging/
 
 <details>
 <summary>点击展开完整更新日志</summary>
+
+### v16 — 20261004（versionCode 2026100420）
+
+- 修复小米 13（fuxi，HyperOS 4 / 内核 5.15）反馈：`charge_control_limit` 停充时写 0 成功，恢复充电时写回 max 失败，日志反复出现「节点写入失败」（issue #4）；
+- 根因：该节点在内核 ABI 中的语义是「最大充电电流」，不是充电开关；v6 的 0/max 用法只适用于特定厂商实现，小米 17 Pro 已改走 MCA；
+- v16 起不再自动写入 `charge_control_limit`，保留在 `probe.sh` 中供诊断，实际停充 / 恢复由 `qcom-battery/input_suspend` 等专用开关完成；
+- 安卓 5-17 适配版与 1-5 遗留 root 版同步修复；
+- `versionCode`：2026100419 → 2026100420。
 
 ### v15 — 20261004（versionCode 2026100419）
 

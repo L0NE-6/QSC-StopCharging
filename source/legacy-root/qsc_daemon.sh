@@ -181,12 +181,8 @@ build_switch_list() {
 	append_entry /sys/class/power_supply/idt/pin_enabled 1 0
 	append_entry /sys/class/qcom-battery/input_suspend 0 1
 	append_entry /sys/class/power_supply/battery/charge_behaviour auto inhibit-charge
-	# 小米17 Pro等新机型：标准 charge_control_limit（0=停止充电，max=恢复充电）
-	ccl_max="$(cat /sys/class/power_supply/battery/charge_control_limit_max 2>/dev/null | tr -d '\r\n')"
-	case "$ccl_max" in
-		''|*[!0-9]*) ;;
-		*) append_entry /sys/class/power_supply/battery/charge_control_limit "$ccl_max" 0 ;;
-	esac
+	# charge_control_limit 的 ABI 语义是「最大充电电流」，不是停充开关；
+	# 部分机型写 0 成功但恢复写 max 失败（issue #4），因此不再自动写入，仅由 probe.sh 诊断展示。
 	append_entry /sys/kernel/debug/google_charger/chg_suspend 0 1
 	append_entry /sys/kernel/debug/google_charger/chg_mode 1 0
 	append_entry /proc/driver/charger_limit_enable 0 1
@@ -201,15 +197,11 @@ build_switch_list() {
 		n="${f##*/}"
 		# 小米14等机型：handle_stop_charging 是内核处理节点，重复写入会引发反复充停
 		[ "$n" = "handle_stop_charging" ] && continue
+		# charge_control_limit 不作为充电开关写入（见上）
+		[ "$n" = "charge_control_limit" ] && continue
 		case "$n" in
 			*charge_behaviour*)
 				append_entry "$f" auto inhibit-charge ;;
-			charge_control_limit)
-				ccl_m="$(cat "${f%/*}/charge_control_limit_max" 2>/dev/null | tr -d '\r\n')"
-				case "$ccl_m" in
-					''|*[!0-9]*) ;;
-					*) append_entry "$f" "$ccl_m" 0 ;;
-				 esac ;;
 			*input_suspend*|*charge*disable*|*disable*charge*|*stop_charge*|*stop_charging*|*charging_suspend*|*slate_mode*|*store_mode*)
 				append_entry "$f" 0 1 ;;
 			*charging_enabled*|*charging_enable*|*enable_charge*|*enable_charging*)

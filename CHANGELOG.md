@@ -1,5 +1,13 @@
 # 更新日志
 
+## v16 — 20261004（versionCode 2026100420）
+
+- 修复小米 13（fuxi，HyperOS 4 / 内核 5.15）反馈：`charge_control_limit` 停充时写 0 成功，恢复充电时写回 max 失败，日志反复出现「节点写入失败」（issue #4）；
+- 根因：该节点在内核 ABI 中的语义是「最大充电电流」，不是充电开关；v6 的 0/max 用法只适用于特定厂商实现，小米 17 Pro 已改走 MCA；
+- v16 起不再自动写入 `charge_control_limit`，保留在 `probe.sh` 中供诊断，实际停充 / 恢复由 `qcom-battery/input_suspend` 等专用开关完成；
+- 安卓 5-17 适配版与 1-5 遗留 root 版同步修复；
+- `versionCode`：2026100419 → 2026100420。
+
 ## v15 — 20261004（versionCode 2026100419）
 
 - 常规更新与优化。
