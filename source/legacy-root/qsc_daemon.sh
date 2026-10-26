@@ -59,9 +59,20 @@ load_config() {
 	POWER_STOP_TIME="$(conf_get_or power_stop_time 3)"
 	CHARGE_FULL="$(conf_get_or charge_full 0)"
 	POWER_RESET="$(conf_get_or power_reset 0)"
+	LOG_ENABLED="$(conf_get_or log_enabled 1)"
+	case "$LOG_ENABLED" in
+		0|1) ;;
+		*) LOG_ENABLED=1 ;;
+	esac
+	LOG_MAX_LINES="$(conf_get_or log_max_lines 300)"
+	case "$LOG_MAX_LINES" in
+		''|*[!0-9]*) LOG_MAX_LINES=300 ;;
+	esac
+	[ "$LOG_MAX_LINES" -lt 100 ] && LOG_MAX_LINES=100
 }
 
 log_line() {
+	[ "$LOG_ENABLED" = "0" ] && return
 	echo "$(date +%F_%T) $*" >> "$LOG"
 }
 
@@ -77,13 +88,22 @@ update_config_log() {
 }
 
 rotate_log() {
+	[ "$LOG_ENABLED" = "0" ] && return
 	[ -f "$LOG" ] || return
 	lines="$(wc -l < "$LOG" 2>/dev/null)"
 	case "$lines" in
 		''|*[!0-9]*) return ;;
 	esac
-	if [ "$lines" -gt 300 ]; then
-		sed -i '1,100d' "$LOG" 2>/dev/null
+	max="$LOG_MAX_LINES"
+	case "$max" in
+		''|*[!0-9]*) max=300 ;;
+	esac
+	[ "$max" -lt 100 ] && max=100
+	if [ "$lines" -gt "$max" ]; then
+		keep=$((max * 2 / 3))
+		[ "$keep" -lt 50 ] && keep=50
+		delete=$((lines - keep))
+		[ "$delete" -gt 0 ] && sed -i "1,${delete}d" "$LOG" 2>/dev/null
 	fi
 }
 
