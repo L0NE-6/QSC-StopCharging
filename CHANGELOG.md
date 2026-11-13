@@ -1,5 +1,13 @@
 # 更新日志
 
+## v18 — 20261004（versionCode 2026100422）
+
+- 新增一加 / OPlus ColorOS 充电开关 `mmi_charging_enable`：`1` 允许充电，`0` 停止充电；
+- 同时覆盖 `/sys/class/oplus_chg/battery/` 与 `/sys/devices/virtual/oplus_chg/battery/` 路径；
+- 修复一加 Ace 2 Pro（ColorOS 16）开机扫描不到充电开关节点的问题；
+- 安卓 5-17 适配版与 1-5 遗留 root 版同步更新；
+- `versionCode`：2026100421 → 2026100422。
+
 ## v17 — 20261004（versionCode 2026100421）
 
 - 新增 `log_enabled` 配置：`1` 记录日志（默认），`0` 停止写入新日志；已有 `log.log` 保留，可手动删除；

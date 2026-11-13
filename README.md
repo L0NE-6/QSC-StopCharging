@@ -65,7 +65,7 @@ QSC 定量停充是一个运行在 root 环境下的充电控制模块：
 - [QSC定量停充_安卓5-17适配版_20261004.zip](dist/QSC定量停充_安卓5-17适配版_20261004.zip)
 - [QSC定量停充_安卓1-5遗留root实验版.zip](dist/QSC定量停充_安卓1-5遗留root实验版.zip)
 
-也可以到本仓库的 **Releases** 页面下载。发布按版本分开、依次递增：**v1**（首个版本）、**v2**（qcom-battery，红米 K40 / K50U 实测可用）、**v3**（管理器内更新）、**v4**（修复小米 14 反复充停）、**v5**（扩展节点扫描 + `charge_behaviour`）、**v6**（`charge_control_limit` 尝试）、**v7**（常规更新）、**v8**（MCA `input_suspend` 适配尝试）、**v9**（MCA `charge_enable` 直接关充电）、**v10**（修复 17 Pro 停充后充电图标不消失）、**v11**（展锐 `stop_charge` 机型停充后自动隐藏充电标识）、**v12**（修复隐藏充电标识后电量显示冻结）、**v13**（移除温控 + 合并开关脚本）、**v14**（常规更新）、**v15**（常规更新与优化）、**v16**（移除 `charge_control_limit` 误写）、**v17**（日志开关与自动清理，当前版本），后续版本继续递增；`dist/` 目录始终是最新版。
+也可以到本仓库的 **Releases** 页面下载。发布按版本分开、依次递增：**v1**（首个版本）、**v2**（qcom-battery，红米 K40 / K50U 实测可用）、**v3**（管理器内更新）、**v4**（修复小米 14 反复充停）、**v5**（扩展节点扫描 + `charge_behaviour`）、**v6**（`charge_control_limit` 尝试）、**v7**（常规更新）、**v8**（MCA `input_suspend` 适配尝试）、**v9**（MCA `charge_enable` 直接关充电）、**v10**（修复 17 Pro 停充后充电图标不消失）、**v11**（展锐 `stop_charge` 机型停充后自动隐藏充电标识）、**v12**（修复隐藏充电标识后电量显示冻结）、**v13**（移除温控 + 合并开关脚本）、**v14**（常规更新）、**v15**（常规更新与优化）、**v16**（移除 `charge_control_limit` 误写）、**v17**（日志开关与自动清理）、**v18**（OPlus `mmi_charging_enable` 适配，当前版本），后续版本继续递增；`dist/` 目录始终是最新版。
 
 ---
 
@@ -179,6 +179,14 @@ QSC-StopCharging/
 
 <details>
 <summary>点击展开完整更新日志</summary>
+
+### v18 — 20261004（versionCode 2026100422）
+
+- 新增一加 / OPlus ColorOS 充电节点 `mmi_charging_enable`（1=允许充电，0=停止充电）；
+- 同时覆盖 `/sys/class/oplus_chg/battery/` 与 `/sys/devices/virtual/oplus_chg/battery/`；
+- 修复一加 Ace 2 Pro（ColorOS 16）扫描不到充电开关节点的问题；
+- 安卓 5-17 适配版与 1-5 遗留 root 版同步更新；
+- `versionCode`：2026100421 → 2026100422。
 
 ### v17 — 20261004（versionCode 2026100421）
 

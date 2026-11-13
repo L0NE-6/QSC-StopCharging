@@ -221,6 +221,9 @@ build_switch_list() {
 	append_entry /sys/class/power_supply/usb/input_suspend 0 1
 	append_entry /sys/class/power_supply/idt/pin_enabled 1 0
 	append_entry /sys/class/qcom-battery/input_suspend 0 1
+	# 一加 / OPlus ColorOS：mmi_charging_enable 1=允许充电，0=停止充电
+	append_entry /sys/class/oplus_chg/battery/mmi_charging_enable 1 0
+	append_entry /sys/devices/virtual/oplus_chg/battery/mmi_charging_enable 1 0
 	append_entry /sys/class/power_supply/battery/charge_behaviour auto inhibit-charge
 	# charge_control_limit 的 ABI 语义是「最大充电电流」，不是停充开关；
 	# 部分机型写 0 成功但恢复写 max 失败（issue #4），因此不再自动写入，仅由 probe.sh 诊断展示。

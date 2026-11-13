@@ -72,3 +72,4 @@ QSC 定量停充 - 安卓5-17 适配版（20261004 R17）
 21. v15：常规更新与优化。
 22. v16：修复小米13等机型 charge_control_limit 恢复充电写入失败（issue #4）；该节点内核 ABI 语义为最大充电电流，不是停充开关，v16 起不再自动写入，仅保留 probe 诊断。
 23. v17：新增 log_enabled（1=记录，0=停止写入新日志）与 log_max_lines（默认300，超过后自动清理旧行）。
+24. v18：新增一加 / OPlus ColorOS `mmi_charging_enable` 充电开关节点支持（1=允许充电，0=停止充电），覆盖 class 与 virtual 两个路径。
